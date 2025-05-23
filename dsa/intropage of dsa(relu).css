@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Visualizer | RELU Club</title>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --accent: #ff2d75;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--light) 0%, #e6f2ff 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.05) 50%, 
+                rgba(255,255,255,0.1) 100%);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-main {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, white, #f3f3f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .logo-sub {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: -0.5rem;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        nav {
+            background-color: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        nav li {
+            margin: 0 1.5rem;
+            position: relative;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+        
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.2), 
+                transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .footer-sub {
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            opacity: 0.7;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 0 0.5rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        /* Particle animation */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                margin: 0.5rem 0;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .logo-main {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="particles" id="particles-js"></div>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-main">DSA Visualizer</div>
+                <div class="logo-sub">RELU CLUB</div>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="subtopics.html">Topics</a></li>
+            <li><a href="about.html">About RELU</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <section class="hero">
+            <h2>Master Data Structures Visually</h2>
+            <p>An interactive learning platform developed by RELU Club to help you understand complex data structures and algorithms through intuitive visualizations.</p>
+            <a href="subtopics.html" class="btn">Explore Topics</a>
+            
+            <div style="margin-top: 3rem;">
+                <div id="dynamicVisualization" style="width: 100%; height: 200px; position: relative;"></div>
+            </div>
+        </section>
+        
+        <section class="features">
+            <div class="feature-card">
+                <h3>Interactive Learning</h3>
+                <p>Manipulate data structures in real-time and see how algorithms work step by step with our dynamic visualizations.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Concept Breakdown</h3>
+                <p>Complex topics explained in simple terms with clear examples and practical applications.</p>
+            </div>
+            <div class="feature-card">
+                <h3>RELU Community</h3>
+                <p>Join our club's learning initiatives and collaborate with fellow computer science enthusiasts.</p>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">DSA Visualizer</div>
+            <div class="footer-sub">RELU CLUB</div>
+            
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="subtopics.html">Topics</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2023 DSA Visualizer | Developed by RELU Club. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Particle animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create particles
+            const particlesContainer = document.getElementById('particles-js');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 5 + 3;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                const opacity = Math.random() * 0.5 + 0.1;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.opacity = opacity;
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Animate particles
+            const particles = document.querySelectorAll('.particle');
+            particles.forEach(particle => {
+                // Random movement
+                const keyframes = [
+                    { transform: 'translate(0, 0)' },
+                    { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)` },
+                    { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)` },
+                    { transform: 'translate(0, 0)' }
+                ];
+                
+                const options = {
+                    duration: Math.random() * 20000 + 10000,
+                    iterations: Infinity
+                };
+                
+                particle.animate(keyframes, options);
+            });
+            
+            // Dynamic visualization on hero section
+            const visualization = document.getElementById('dynamicVisualization');
+            const structures = ['linkedlist', 'stack', 'queue', 'tree', 'graph'];
+            let currentStructure = 0;
+            
+            function animateStructures() {
+                visualization.innerHTML = '';
+                
+                // Create visualization based on current structure
+                switch(structures[currentStructure]) {
+                    case 'linkedlist':
+                        createLinkedList(visualization);
+                        break;
+                    case 'stack':
+                        createStack(visualization);
+                        break;
+                    case 'queue':
+                        createQueue(visualization);
+                        break;
+                    case 'tree':
+                        createTree(visualization);
+                        break;
+                    case 'graph':
+                        createGraph(visualization);
+                        break;
+                }
+                
+                currentStructure = (currentStructure + 1) % structures.length;
+                setTimeout(animateStructures, 3000);
+            }
+            
+            function createLinkedList(container) {
+                container.style.height = '100px';
+                
+                const list = document.createElement('div');
+                list.style.display = 'flex';
+                list.style.justifyContent = 'center';
+                list.style.alignItems = 'center';
+                list.style.gap = '10px';
+                
+                for (let i = 0; i < 5; i++) {
+                    const node = document.createElement('div');
+                    node.style.width = '50px';
+                    node.style.height = '50px';
+                    node.style.backgroundColor = '#6a11cb';
+                    node.style.borderRadius = '5px';
+                    node.style.display = 'flex';
+                    node.style.justifyContent = 'center';
+                    node.style.alignItems = 'center';
+                    node.style.color = 'white';
+                    node.style.fontWeight = 'bold';
+                    node.textContent = i + 1;
+                    
+                    const arrow = document.createElement('div');
+                    arrow.style.width = '20px';
+                    arrow.style.height = '2px';
+                    arrow.style.backgroundColor = '#2575fc';
+                    arrow.style.position = 'relative';
+                    
+                    if (i < 4) {
+                        const arrowHead = document.createElement('div');
+                        arrowHead.style.width = '0';
+                        arrowHead.style.height = '0';
+                        arrowHead.style.borderTop = '5px solid transparent';
+                        arrowHead.style.borderBottom = '5px solid transparent';
+                        arrowHead.style.borderLeft = '10px solid #2575fc';
+                        arrowHead.style.position = 'absolute';
+                        arrowHead.style.right = '-10px';
+                        arrowHead.style.top = '-4px';
+                        arrow.appendChild(arrowHead);
+                    }
+                    
+                    list.appendChild(node);
+                    if (i < 4) list.appendChild(arrow);
+                }
+                
+                container.appendChild(list);
+                
+                // Animation
+                const nodes = list.querySelectorAll('div');
+                nodes.forEach((node, index) => {
+                    setTimeout(() => {
+                        node.style.transform = 'scale(1.1)';
+                        node.style.boxShadow = '0 0 10px rgba(106, 17, 203, 0.7)';
+                        
+                        setTimeout(() => {
+                            node.style.transform = 'scale(1)';
+                            node.style.boxShadow = 'none';
+                        }, 500);
+                    }, index * 200);
+                });
+            }
+            
+            function createStack(container) {
+                container.style.height = '150px';
+                
+                const stack = document.createElement('div');
+                stack.style.width = '100px';
+                stack.style.height = '150px';
+                stack.style.margin = '0 auto';
+                stack.style.position = 'relative';
+                stack.style.border = '2px solid #6a11cb';
+                stack.style.borderRadius = '5px 5px 0 0';
+                stack.style.borderBottom = 'none';
+                
+                for (let i = 0; i < 4; i++) {
+                    const item = document.createElement('div');
+                    item.style.width = '100%';
+                    item.style.height = '30px';
+                    item.style.backgroundColor = i % 2 === 0 ? '#6a11cb' : '#2575fc';
+                    item.style.position = 'absolute';
+                    item.style.bottom = `${i * 30}px`;
+                    item.style.left = '0';
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'center';
+                    item.style.alignItems = 'center';
+                    item.style.color = 'white';
+                    item.style.fontWeight = 'bold';
+                    item.textContent = 4 - i;
+                    item.style.transition = 'all 0.5s ease';
+                    
+                    stack.appendChild(item);
+                }
+                
+                container.appendChild(stack);
+                
+                // Animation - push and pop
+                setTimeout(() => {
+                    const items = stack.querySelectorAll('div');
+                    
+                    // Pop animation
+                    items[0].style.transform = 'translateY(-40px)';
+                    items[0].style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        // Push animation
+                        const newItem = document.createElement('div');
+                        newItem.style.width = '100%';
+                        newItem.style.height = '30px';
+                        newItem.style.backgroundColor = '#ff2d75';
+                        newItem.style.position = 'absolute';
+                        newItem.style.bottom = '90px';
+                        newItem.style.left = '0';
+                        newItem.style.display = 'flex';
+                        newItem.style.justifyContent = 'center';
+                        newItem.style.alignItems = 'center';
+                        newItem.style.color = 'white';
+                        newItem.style.fontWeight = 'bold';
+                        newItem.textContent = '5';
+                        newItem.style.opacity = '0';
+                        newItem.style.transform = 'translateY(-40px)';
+                        
+                        stack.appendChild(newItem);
+                        
+                        setTimeout(() => {
+                            newItem.style.opacity = '1';
+                            newItem.style.transform = 'translateY(0)';
+                        }, 100);
+                    }, 500);
+                }, 1000);
+            }
+            
+            // Start the animation
+            animateStructures();
+            
+            // Floating effect for feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`;
+                card.classList.add('floating');
+            });
+            
+            // Button hover effect enhancement
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    button.style.background = `linear-gradient(45deg, ${getComputedStyle(document.documentElement).getPropertyValue('--secondary')}, ${getComputedStyle(document.documentElement).getPropertyValue('--primary')})`;
+                });
+                
+                button.addEventListener('mouseleave', () => {
+                    button.style.background = `linear-gradient(45deg, ${getComputedStyle(document.documentElement).getPropertyValue('--primary')}, ${getComputedStyle(document.documentElement).getPropertyValue('--secondary')})`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

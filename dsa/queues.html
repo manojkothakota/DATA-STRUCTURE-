@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Queue Visualizer</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%);
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            padding: 32px 32px 20px 32px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            color: #1e40af;
+            font-weight: 700;
+        }
+        .mode-selector, .input-panel, .sorting-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .mode-btn, .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            background: #e0e7ff;
+            cursor: pointer;
+            font-size: 1.05em;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #0001;
+        }
+        .mode-btn.active {
+            background: #2563eb;
+            color: #fff;
+            box-shadow: 0 4px 16px #2563eb33;
+        }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-warning { background: #fb923c; color: #fff; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-info { background: #06b6d4; color: #fff; }
+        .btn:hover, .mode-btn:hover { filter: brightness(1.08); }
+        .queue-container {
+            margin: 30px 0 20px 0;
+            position: relative;
+            min-height: 110px;
+        }
+        .queue-display {
+            display: flex;
+            gap: 18px;
+            min-height: 80px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            transition: all 0.5s;
+        }
+        .queue-item {
+            background: #2563eb;
+            color: #fff;
+            padding: 18px 30px 18px 30px;
+            border-radius: 16px;
+            font-size: 1.25em;
+            position: relative;
+            min-width: 60px;
+            text-align: center;
+            box-shadow: 0 2px 12px #2563eb22;
+            margin-bottom: 24px;
+            transition: transform 0.5s cubic-bezier(.68,-0.55,.27,1.55), box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .queue-item.front {
+            border: 3px solid #fb923c;
+            box-shadow: 0 0 0 4px #fb923c33;
+            animation: bounce 0.5s;
+        }
+        .queue-item.rear {
+            border: 3px solid #06b6d4;
+            box-shadow: 0 0 0 4px #06b6d433;
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0% { transform: scale(1.1); }
+            60% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        .priority-label {
+            font-size: 0.85em;
+            color: #fff;
+            background: #fb923c;
+            border-radius: 8px;
+            padding: 2px 10px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        .queue-label {
+            position: absolute;
+            bottom: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            color: #2563eb;
+            font-size: 0.95em;
+            font-weight: 700;
+            padding: 3px 14px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #2563eb22;
+            border: 2px solid #2563eb;
+            z-index: 2;
+            animation: labelPop 0.5s;
+        }
+        .queue-label.rear {
+            color: #06b6d4;
+            border-color: #06b6d4;
+        }
+        .queue-label.front {
+            color: #fb923c;
+            border-color: #fb923c;
+        }
+        @keyframes labelPop {
+            0% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+       
+        .log {
+            max-height: 140px;
+            overflow-y: auto;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1em;
+            box-shadow: 0 2px 8px #0001;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin-bottom: 6px;
+            font-size: 0.97em;
+        }
+        .log-entry.enqueue { color: #2563eb; }
+        .log-entry.dequeue { color: #fb923c; }
+        .log-entry.clear { color: #ef4444; }
+        .log-entry.sort { color: #06b6d4; }
+        .log-entry.peek { color: #059669; }
+        #setupPanel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        #setupInputs input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            min-width: 220px;
+            background: #f8fafc;
+        }
+        #enqueuePriority { display: none; }
+        .sorting-options label { margin-right: 18px; font-size: 1.07em; }
+        
+        /* Information Section Styles */
+        .info-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .info-section h2 {
+            color: #1e40af;
+            margin-top: 0;
+            border-bottom: 2px solid #e0e7ff;
+            padding-bottom: 10px;
+        }
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .info-card h3 {
+            color: #2563eb;
+            margin-top: 0;
+        }
+        .info-card ul {
+            padding-left: 20px;
+        }
+        .info-card li {
+            margin-bottom: 8px;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #e0e7ff;
+        }
+        .tab-btn {
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .term-def {
+            margin-bottom: 15px;
+        }
+        .term-def dt {
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+        .term-def dd {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 700px) {
+            .container { padding: 12px; }
+            .queue-item { padding: 12px 10px; font-size: 1em; }
+            #setupInputs input { min-width: 120px; }
+            .mode-selector, .input-panel, .sorting-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+        }
+        footer {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 3rem 0;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-logo {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-sub {
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  opacity: 0.7;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.footer-links a {
+  color: #fff;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #2ecc71;
+}
+
+
+
+.copyright {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Queue Visualizer</h1>
+    <div class="mode-selector">
+        <button class="mode-btn active" id="basicModeBtn" onclick="setMode('basic')">Basic Queue</button>
+        <button class="mode-btn" id="sortedModeBtn" onclick="setMode('sorted')">Sorted Queue</button>
+        <button class="mode-btn" id="priorityModeBtn" onclick="setMode('priority')">Priority Queue</button>
+    </div>
+
+    <!-- Setup Panel: Initial Values -->
+    <div id="setupPanel">
+        <div id="setupInputs">
+            <input type="text" id="initialValues" placeholder="Enter values, e.g. 5,3,8">
+            <input type="text" id="initialPriorities" placeholder="Enter priorities, e.g. 2,1,3" style="display:none;">
+        </div>
+        <button class="btn btn-primary" onclick="createQueue()">Create Queue</button>
+    </div>
+
+    <!-- Input Panel: Enqueue/Dequeue/Sort -->
+    <div class="input-panel" id="inputPanel" style="display:none;">
+        <input type="text" id="enqueueValue" placeholder="Value">
+        <input type="number" id="enqueuePriority" placeholder="Priority" min="1">
+        <button class="btn btn-primary" onclick="enqueue()">Enqueue</button>
+        <button class="btn btn-warning" onclick="dequeue()">Dequeue</button>
+        <button class="btn btn-info" onclick="peek()">Peek</button>
+        <button class="btn btn-danger" onclick="clearQueue()">Clear Queue</button>
+    </div>
+    <div class="sorting-options" id="sortingOptions" style="display:none;">
+        <label><input type="radio" name="sortCriteria" value="value" checked onchange="setSortCriteria('value')">Sort by Value</label>
+        <label id="prioritySortOption" style="display:none;"><input type="radio" name="sortCriteria" value="priority" onchange="setSortCriteria('priority')">Sort by Priority</label>
+        <label><input type="radio" name="sortOrder" value="asc" checked onchange="setSortOrder('asc')">Asc</label>
+        <label><input type="radio" name="sortOrder" value="desc" onchange="setSortOrder('desc')">Desc</label>
+        <button class="btn btn-info" onclick="sortQueue()">Sort Now</button>
+    </div>
+
+    <div class="queue-container">
+        <div class="queue-display" id="queueDisplay"></div>
+    </div>
+    
+    <!-- Operation Log -->
+    <div class="log" id="operationLog"></div>
+    
+    <!-- Information Section -->
+    <div class="info-section">
+        <h2>Queue Information</h2>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="openInfoTab(event, 'tab-basics')">Basics</button>
+            <button class="tab-btn" onclick="openInfoTab(event, 'tab-operations')">Operations</button>
+            <button class="tab-btn" onclick="openInfoTab(event, 'tab-priority')">Priority Queue</button>
+            <button class="tab-btn" onclick="openInfoTab(event, 'tab-applications')">Applications</button>
+        </div>
+        
+        <div id="tab-basics" class="tab-content active">
+            <div class="info-card">
+                <h3>What is a Queue?</h3>
+                <p>A queue is a linear data structure that follows the <strong>First-In-First-Out (FIFO)</strong> principle. The element that is inserted first is the first one to be removed.</p>
+                
+                <div class="term-def">
+                    <dl>
+                        <dt>Front</dt>
+                        <dd>The first element of the queue (next to be removed)</dd>
+                        
+                        <dt>Rear</dt>
+                        <dd>The last element of the queue (most recently added)</dd>
+                        
+                        <dt>Enqueue</dt>
+                        <dd>The operation to add an element to the rear of the queue</dd>
+                        
+                        <dt>Dequeue</dt>
+                        <dd>The operation to remove an element from the front of the queue</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-operations" class="tab-content">
+            <div class="info-card">
+                <h3>Queue Operations</h3>
+                
+                <div class="term-def">
+                    <dl>
+                        <dt>enqueue(item)</dt>
+                        <dd>Adds an item to the rear of the queue. Time complexity: O(1) for simple queue.</dd>
+                        
+                        <dt>dequeue()</dt>
+                        <dd>Removes and returns the item at the front of the queue. Time complexity: O(1) for simple queue.</dd>
+                        
+                        <dt>peek() / front()</dt>
+                        <dd>Returns the front item without removing it. Time complexity: O(1).</dd>
+                        
+                        <dt>isEmpty()</dt>
+                        <dd>Returns true if the queue is empty. Time complexity: O(1).</dd>
+                        
+                        <dt>isFull()</dt>
+                        <dd>For fixed-size queues, returns true if no more elements can be added. Not applicable for dynamic queues.</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-priority" class="tab-content">
+            <div class="info-card">
+                <h3>Priority Queue</h3>
+                <p>A priority queue is a special type of queue where each element has a priority value, and elements are served according to their priority rather than just the FIFO order.</p>
+                
+                <h4>Key Characteristics:</h4>
+                <ul>
+                    <li>Each element has a value and an associated priority</li>
+                    <li>Higher priority elements are dequeued before lower priority ones</li>
+                    <li>Elements with same priority are served according to their order in the queue</li>
+                    <li>Often implemented using heaps for efficient operations (O(log n) for insertion and extraction)</li>
+                </ul>
+                
+                <h4>Types of Priority Queues:</h4>
+                <ul>
+                    <li><strong>Min-Priority Queue:</strong> Element with smallest priority is dequeued first</li>
+                    <li><strong>Max-Priority Queue:</strong> Element with largest priority is dequeued first</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="tab-applications" class="tab-content">
+            <div class="info-card">
+                <h3>Applications of Queues</h3>
+                
+                <h4>Basic Queue Applications:</h4>
+                <ul>
+                    <li><strong>CPU Scheduling:</strong> Processes waiting for CPU time</li>
+                    <li><strong>Print Queue:</strong> Documents waiting to be printed</li>
+                    <li><strong>Breadth-First Search (BFS):</strong> Graph traversal algorithm</li>
+                    <li><strong>Call Center Systems:</strong> Customers waiting in line</li>
+                    <li><strong>Buffers:</strong> Data transfer between processes</li>
+                </ul>
+                
+                <h4>Priority Queue Applications:</h4>
+                <ul>
+                    <li><strong>Dijkstra's Algorithm:</strong> Finding shortest paths in graphs</li>
+                    <li><strong>Huffman Coding:</strong> Data compression algorithm</li>
+                    <li><strong>Operating System Scheduling:</strong> Higher priority processes get CPU first</li>
+                    <li><strong>Emergency Room Triage:</strong> More critical patients treated first</li>
+                    <li><strong>Bandwidth Management:</strong> Higher priority network packets get transmitted first</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+ <footer>
+  <div class="footer-content">
+    <div class="footer-logo">DSA Visualizer</div>
+    <div class="footer-sub">RELU CLUB</div>
+    
+    <div class="footer-links">
+      <a href="intropage of dsa(relu).html">Home</a>
+      <a href="subtopics.html">Topics</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+    
+   
+    
+    <div class="copyright">
+      &copy; 2025 DSA Visualizer | Developed by RELU Club. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script>
+let queue = [];
+let currentMode = 'basic';
+let sortCriteria = 'value';
+let sortOrder = 'asc';
+
+// DOM Elements
+const setupPanel = document.getElementById('setupPanel');
+const inputPanel = document.getElementById('inputPanel');
+const sortingOptions = document.getElementById('sortingOptions');
+const prioritySortOption = document.getElementById('prioritySortOption');
+const initialValues = document.getElementById('initialValues');
+const initialPriorities = document.getElementById('initialPriorities');
+const enqueuePriority = document.getElementById('enqueuePriority');
+const queueDisplay = document.getElementById('queueDisplay');
+const operationLog = document.getElementById('operationLog');
+const enqueueValue = document.getElementById('enqueueValue');
+
+// --- MODE SETUP ---
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    if (mode === 'basic') document.getElementById('basicModeBtn').classList.add('active');
+    if (mode === 'sorted') document.getElementById('sortedModeBtn').classList.add('active');
+    if (mode === 'priority') document.getElementById('priorityModeBtn').classList.add('active');
+
+    initialPriorities.style.display = (mode === 'priority') ? 'block' : 'none';
+    enqueuePriority.style.display = (mode === 'priority') ? 'block' : 'none';
+    prioritySortOption.style.display = (mode === 'priority') ? 'inline' : 'none';
+    sortingOptions.style.display = (mode !== 'basic') ? 'flex' : 'none';
+
+    // Reset everything for new mode
+    queue = [];
+    setupPanel.style.display = 'flex';
+    inputPanel.style.display = 'none';
+    queueDisplay.innerHTML = '';
+    operationLog.innerHTML = '';
+    initialValues.value = '';
+    initialPriorities.value = '';
+    enqueueValue.value = '';
+    enqueuePriority.value = '';
+    addLog(`Mode set to ${mode}. Please enter initial values and click Create Queue.`, 'sort');
+}
+
+// --- CREATE QUEUE FROM USER INPUT ---
+function createQueue() {
+    let values = initialValues.value.split(',').map(x => x.trim()).filter(x => x !== '');
+    if (values.length === 0) { alert('Please enter at least one value.'); return; }
+    if (currentMode === 'priority') {
+        let priorities = initialPriorities.value.split(',').map(x => x.trim()).filter(x => x !== '');
+        if (priorities.length !== values.length) {
+            alert('Please enter the same number of priorities as values.');
+            return;
+        }
+        queue = values.map((v, i) => ({ value: parseInt(v), priority: parseInt(priorities[i]) || 1 }));
+    } else {
+        queue = values.map(v => parseInt(v));
+    }
+    setupPanel.style.display = 'none';
+    inputPanel.style.display = 'flex';
+    if (currentMode !== 'basic') sortingOptions.style.display = 'flex';
+    sortQueue(); // If sorted/priority, sort initially
+    renderQueue();
+    addLog('Queue created: ' + JSON.stringify(queue), 'enqueue');
+}
+
+// --- ENQUEUE ---
+function enqueue() {
+    let val = enqueueValue.value.trim();
+    if (val === '') { alert('Enter a value to enqueue.'); return; }
+    let element = (currentMode === 'priority')
+        ? { value: parseInt(val), priority: parseInt(enqueuePriority.value) || 1 }
+        : parseInt(val);
+
+    if (currentMode === 'basic') {
+        queue.push(element);
+    } else {
+        // Insert in correct position based on sortCriteria and sortOrder
+        let insertIndex = queue.findIndex(item => {
+            let a = (currentMode === 'priority')
+                ? (sortCriteria === 'value' ? item.value : item.priority)
+                : item;
+            let b = (currentMode === 'priority')
+                ? (sortCriteria === 'value' ? element.value : element.priority)
+                : element;
+            return sortOrder === 'asc' ? a > b : a < b;
+        });
+        if (insertIndex === -1) queue.push(element);
+        else queue.splice(insertIndex, 0, element);
+    }
+    enqueueValue.value = '';
+    enqueuePriority.value = '';
+    renderQueue('enqueue');
+    addLog(`Enqueued: ${JSON.stringify(element)}`, 'enqueue');
+}
+
+// --- DEQUEUE ---
+function dequeue() {
+    if (queue.length === 0) { addLog('Queue is empty.', 'dequeue'); return; }
+    let removed = queue.shift();
+    renderQueue('dequeue');
+    addLog(`Dequeued: ${JSON.stringify(removed)}`, 'dequeue');
+}
+
+// --- SORTING ---
+function setSortCriteria(criteria) {
+    sortCriteria = criteria;
+    addLog(`Sorting by ${criteria}`, 'sort');
+}
+function setSortOrder(order) {
+    sortOrder = order;
+    addLog(`Sort order set to ${order}`, 'sort');
+}
+function sortQueue() {
+    if (currentMode === 'basic') return;
+    queue.sort((a, b) => {
+        let valA = (currentMode === 'priority')
+            ? (sortCriteria === 'value' ? a.value : a.priority)
+            : a;
+        let valB = (currentMode === 'priority')
+            ? (sortCriteria === 'value' ? b.value : b.priority)
+            : b;
+        return sortOrder === 'asc' ? valA - valB : valB - valA;
+    });
+    renderQueue('sort');
+    addLog(`Queue sorted by ${sortCriteria} (${sortOrder})`, 'sort');
+}
+
+// --- CLEAR/PEEK ---
+function clearQueue() {
+    queue = [];
+    renderQueue();
+    addLog('Queue cleared.', 'clear');
+}
+function peek() {
+    if (queue.length === 0) { addLog('Queue is empty.', 'peek'); return; }
+    addLog(`Front element: ${JSON.stringify(queue[0])}`, 'peek');
+}
+
+// --- RENDER & LOG ---
+function renderQueue(action) {
+    queueDisplay.innerHTML = '';
+    queue.forEach((item, idx) => {
+        let div = document.createElement('div');
+        div.className = 'queue-item';
+        if (idx === 0) div.classList.add('front');
+        if (idx === queue.length-1) div.classList.add('rear');
+        if (currentMode === 'priority') {
+            div.innerHTML = `<div>${item.value}</div><div class="priority-label">P:${item.priority}</div>`;
+        } else {
+            div.textContent = item;
+        }
+        // Add dynamic labels
+        if (idx === 0) {
+            let label = document.createElement('div');
+            label.className = 'queue-label front';
+            label.textContent = 'FRONT';
+            div.appendChild(label);
+        }
+        if (idx === queue.length-1) {
+            let label = document.createElement('div');
+            label.className = 'queue-label rear';
+            label.textContent = 'REAR';
+            div.appendChild(label);
+        }
+        queueDisplay.appendChild(div);
+    });
+}
+
+function addLog(message, type) {
+    let entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+    entry.textContent = message;
+    operationLog.appendChild(entry);
+    operationLog.scrollTop = operationLog.scrollHeight;
+}
+
+// --- INFO TABS ---
+function openInfoTab(evt, tabName) {
+    const tabContents = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove("active");
+    }
+    
+    const tabButtons = document.getElementsByClassName("tab-btn");
+    for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove("active");
+    }
+    
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+}
+
+// --- INITIALIZE ---
+setMode('basic');
+</script>
+</body>
+</html>

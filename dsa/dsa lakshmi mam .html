@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expression Format Converter with Evaluation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+             background: linear-gradient(145deg, #8e2de2, #4a00e0);;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .input-panel {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        select {
+            cursor: pointer;
+        }
+        .checkbox-group {
+            margin-top: 10px;
+        }
+        .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .result-table th {
+            background-color: #3498db;
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+        .result-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+        .result-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .result-table tr:hover {
+            background-color: #e6f7ff;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .instructions {
+            background-color: #e1f5fe;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #0277bd;
+        }
+        .value-panel {
+            display: none;
+        }
+        .value-panel.active {
+            display: block;
+        }
+        .value-input {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .value-pair {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+        .value-pair label {
+            margin-right: 5px;
+            margin-bottom: 0;
+        }
+        .value-pair input {
+            width: 60px;
+            padding: 5px;
+        }
+        .steps-container {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .step-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .step-table th {
+            background-color: #4CAF50;
+            color: white;
+            text-align: left;
+            padding: 8px;
+        }
+        .step-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .step-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .step-table tr:hover {
+            background-color: #e6f7ff;
+        }
+        .hide-section {
+            display: none;
+        } footer {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 3rem 0;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-logo {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-sub {
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  opacity: 0.7;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.footer-links a {
+  color: #fff;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #2ecc71;
+}
+
+
+
+.copyright {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expression Format Converter with Evaluation</h1>
+        
+        <div class="tab-container">
+            <div class="tab active" data-panel="conversion-panel">Conversion</div>
+            <div class="tab" data-panel="evaluation-panel">Evaluation</div>
+            <div class="tab" data-panel="explanation-panel">Explanation</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions</h3>
+            <p>Enter an expression in the format specified and select the desired conversion. Use single letters or digits as operands (a, b, c, 1, 2, 3). Supported operators: +, -, *, /, ^</p>
+            <p><strong>Example:</strong> "a+b*c" (Infix), "abc*+" (Postfix), or "+a*bc" (Prefix)</p>
+            <p>Switch to the Evaluation tab to calculate the result by providing values for variables.</p>
+        </div>
+        
+        <div class="value-panel active" id="conversion-panel">
+            <div class="input-panel">
+                <div class="form-group">
+                    <label for="input-format">Input Format:</label>
+                    <select id="input-format">
+                        <option value="infix">Infix</option>
+                        <option value="postfix">Postfix</option>
+                        <option value="prefix">Prefix</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expression">Enter Expression:</label>
+                    <input type="text" id="expression" placeholder="Example: a+b*c or abc*+ or +a*bc" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="output-format">Convert To:</label>
+                    <select id="output-format">
+                        <option value="all">All Formats</option>
+                        <option value="infix">Infix</option>
+                        <option value="postfix">Postfix</option>
+                        <option value="prefix">Prefix</option>
+                    </select>
+                </div>
+                
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="show-steps" checked="checked">
+                        Show conversion steps
+                    </label>
+                </div>
+                
+                <button id="convert">Convert</button>
+                <div id="error" class="error"></div>
+            </div>
+            
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Expression</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="infix-row">
+                        <td>Infix</td>
+                        <td id="infix-result">-</td>
+                    </tr>
+                    <tr id="postfix-row">
+                        <td>Postfix</td>
+                        <td id="postfix-result">-</td>
+                    </tr>
+                    <tr id="prefix-row">
+                        <td>Prefix</td>
+                        <td id="prefix-result">-</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div id="steps-section" class="steps-container hide-section">
+                <h3>Conversion Steps</h3>
+                <div id="steps-content"></div>
+            </div>
+        </div>
+        
+        <div class="value-panel" id="evaluation-panel">
+            <div class="input-panel">
+                <div class="form-group">
+                    <label for="eval-format">Expression Format:</label>
+                    <select id="eval-format">
+                        <option value="infix">Infix</option>
+                        <option value="postfix">Postfix</option>
+                        <option value="prefix">Prefix</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="eval-expression">Enter Expression:</label>
+                    <input type="text" id="eval-expression" placeholder="Example: a+b*c or abc*+ or +a*bc" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Variable Values:</label>
+                    <div id="variable-inputs" class="value-input">
+                        <!-- Variable inputs will be generated here -->
+                    </div>
+                </div>
+                
+                <button id="evaluate">Evaluate</button>
+                <div id="eval-error" class="error"></div>
+            </div>
+            
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>Expression</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="expression-display">-</td>
+                        <td id="evaluation-result">-</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div id="eval-steps-section" class="steps-container hide-section">
+                <h3>Evaluation Steps</h3>
+                <div id="eval-steps-content"></div>
+            </div>
+        </div>
+        
+        <div class="value-panel" id="explanation-panel">
+            <div class="instructions">
+                <h2>Expression Notations</h2>
+                <h3>Infix Notation</h3>
+                <p>This is the standard notation we use in everyday mathematics, where the operator is placed between the operands (e.g., a + b).</p>
+                <p><strong>Example:</strong> a + b * c</p>
+                
+                <h3>Postfix Notation (Reverse Polish Notation)</h3>
+                <p>The operator follows its operands (e.g., ab+). This notation eliminates the need for parentheses and is easier for computers to process.</p>
+                <p><strong>Example:</strong> abc*+</p>
+                
+                <h3>Prefix Notation (Polish Notation)</h3>
+                <p>The operator precedes its operands (e.g., +ab). Like postfix, it eliminates the need for parentheses.</p>
+                <p><strong>Example:</strong> +a*bc</p>
+                
+                <h2>Evaluation Instructions</h2>
+                <p>To evaluate an expression:</p>
+                <ol>
+                    <li>Switch to the Evaluation tab</li>
+                    <li>Enter your expression</li>
+                    <li>Provide values for all variables</li>
+                    <li>Click "Evaluate" to see the result</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+     <footer>
+  <div class="footer-content">
+    <div class="footer-logo">DSA Visualizer</div>
+    <div class="footer-sub">RELU CLUB</div>
+    
+    <div class="footer-links">
+      <a href="intropage of dsa(relu).html">Home</a>
+      <a href="subtopics.html">Topics</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+    
+   
+    
+    <div class="copyright">
+      &copy; 2025 DSA Visualizer | Developed by RELU Club. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+    <script>
+        // Global variables
+        let conversionSteps = [];
+        let evaluationSteps = [];
+
+        // Helper functions
+        function precedence(ch) {
+            switch (ch) {
+                case '+': case '-': return 1;
+                case '*': case '/': return 2;
+                case '^': return 3;
+                default: return -1;
+            }
+        }
+
+        function isOperator(ch) {
+            return ['+', '-', '*', '/', '^'].includes(ch);
+        }
+
+        function isOperand(ch) {
+            return /[a-zA-Z0-9.]/.test(ch);
+        }
+
+        // Conversion functions - each with its own step tracking
+        function infixToPostfixWithSteps(infix) {
+            const result = [];
+            const stack = [];
+            const steps = [];
+
+            for (let i = 0; i < infix.length; i++) {
+                const c = infix[i];
+                
+                if (c === ' ') continue;
+                
+                if (isOperand(c)) {
+                    result.push(c);
+                    steps.push({
+                        symbol: c,
+                        output: result.join(''),
+                        stack: stack.slice().join(' ') || "EMPTY",
+                        action: "Add operand to output"
+                    });
+                } else if (c === '(') {
+                    stack.push(c);
+                    steps.push({
+                        symbol: c,
+                        output: result.join(''),
+                        stack: stack.join(' '),
+                        action: "Push '(' to stack"
+                    });
+                } else if (c === ')') {
+                    let foundMatching = false;
+                    let action = "Pop until '('";
+                    
+                    while (stack.length > 0) {
+                        const top = stack.pop();
+                        if (top === '(') {
+                            foundMatching = true;
+                            break;
+                        }
+                        result.push(top);
+                    }
+                    
+                    if (!foundMatching) throw new Error("Mismatched parentheses");
+                    
+                    steps.push({
+                        symbol: c,
+                        output: result.join(''),
+                        stack: stack.join(' ') || "EMPTY",
+                        action: action
+                    });
+                } else if (isOperator(c)) {
+                    let action = "";
+                    
+                    while (stack.length > 0 && precedence(c) <= precedence(stack[stack.length - 1])) {
+                        result.push(stack.pop());
+                        action = "Pop higher precedence";
+                    }
+                    
+                    stack.push(c);
+                    
+                    if (!action) {
+                        action = "Push operator to stack";
+                    } else {
+                        action += ", then push operator";
+                    }
+                    
+                    steps.push({
+                        symbol: c,
+                        output: result.join(''),
+                        stack: stack.join(' '),
+                        action: action
+                    });
+                } else {
+                    throw new Error(`Invalid character: ${c}`);
+                }
+            }
+            
+            // Pop remaining operators
+            while (stack.length > 0) {
+                const top = stack.pop();
+                if (top === '(') throw new Error("Mismatched parentheses");
+                result.push(top);
+            }
+            
+            if (stack.length === 0 && result.length > 0) {
+                steps.push({
+                    symbol: "END",
+                    output: result.join(''),
+                    stack: "EMPTY",
+                    action: "Pop remaining operators"
+                });
+            }
+            
+            return {
+                result: result.join(''),
+                steps: steps
+            };
+        }
+
+        function infixToPrefixWithSteps(infix) {
+            // Step 1: Reverse the infix expression
+            let reversedInfix = '';
+            const reverseSteps = [];
+            for (let i = infix.length - 1; i >= 0; i--) {
+                let char = infix[i];
+                if (char === '(') reversedInfix += ')';
+                else if (char === ')') reversedInfix += '(';
+                else reversedInfix += char;
+            }
+            
+            reverseSteps.push({
+                symbol: "REVERSE",
+                output: reversedInfix,
+                stack: "N/A",
+                action: "Reversed infix expression"
+            });
+            
+            // Step 2: Convert the reversed infix to postfix
+            const postfixResult = infixToPostfixWithSteps(reversedInfix);
+            
+            // Step 3: Reverse the postfix to get the prefix
+            let prefix = '';
+            for (let i = postfixResult.result.length - 1; i >= 0; i--) {
+                prefix += postfixResult.result[i];
+            }
+            
+            reverseSteps.push({
+                symbol: "REVERSE",
+                output: prefix,
+                stack: "N/A",
+                action: "Reversed postfix to get prefix"
+            });
+            
+            return {
+                result: prefix,
+                steps: [...reverseSteps, ...postfixResult.steps.map(step => ({
+                    ...step,
+                    action: "Postfix conversion: " + step.action
+                }))]
+            };
+        }
+
+        function postfixToInfixWithSteps(postfix) {
+            const stack = [];
+            const steps = [];
+            
+            for (let i = 0; i < postfix.length; i++) {
+                const c = postfix[i];
+                
+                if (c === ' ') continue;
+                
+                if (isOperand(c)) {
+                    stack.push(c);
+                    steps.push({
+                        symbol: c,
+                        stack: stack.slice().join(' '),
+                        action: "Push operand to stack"
+                    });
+                } else if (isOperator(c)) {
+                    if (stack.length < 2) throw new Error("Invalid postfix expression");
+                    
+                    const operand2 = stack.pop();
+                    const operand1 = stack.pop();
+                    
+                    const result = `(${operand1}${c}${operand2})`;
+                    stack.push(result);
+                    
+                    steps.push({
+                        symbol: c,
+                        stack: stack.join(' '),
+                        action: `Apply ${c} to ${operand1} and ${operand2}`
+                    });
+                } else {
+                    throw new Error(`Invalid character: ${c}`);
+                }
+            }
+            
+            if (stack.length !== 1) throw new Error("Invalid postfix expression");
+            
+            let result = stack[0];
+            if (result.startsWith('(') && result.endsWith(')')) {
+                result = result.slice(1, -1);
+            }
+            
+            return {
+                result: result,
+                steps: steps
+            };
+        }
+
+        function prefixToInfixWithSteps(prefix) {
+            const stack = [];
+            const steps = [];
+            
+            for (let i = prefix.length - 1; i >= 0; i--) {
+                const c = prefix[i];
+                
+                if (c === ' ') continue;
+                
+                if (isOperand(c)) {
+                    stack.push(c);
+                    steps.push({
+                        symbol: c,
+                        stack: stack.slice().join(' '),
+                        action: "Push operand to stack"
+                    });
+                } else if (isOperator(c)) {
+                    if (stack.length < 2) throw new Error("Invalid prefix expression");
+                    
+                    const operand1 = stack.pop();
+                    const operand2 = stack.pop();
+                    
+                    const result = `(${operand1}${c}${operand2})`;
+                    stack.push(result);
+                    
+                    steps.push({
+                        symbol: c,
+                        stack: stack.join(' '),
+                        action: `Apply ${c} to ${operand1} and ${operand2}`
+                    });
+                } else {
+                    throw new Error(`Invalid character: ${c}`);
+                }
+            }
+            
+            if (stack.length !== 1) throw new Error("Invalid prefix expression");
+            
+            let result = stack[0];
+            if (result.startsWith('(') && result.endsWith(')')) {
+                result = result.slice(1, -1);
+            }
+            
+            return {
+                result: result,
+                steps: steps
+            };
+        }
+
+        function postfixToPrefixWithSteps(postfix) {
+            const infixResult = postfixToInfixWithSteps(postfix);
+            const prefixResult = infixToPrefixWithSteps(infixResult.result);
+            
+            return {
+                result: prefixResult.result,
+                steps: [
+                    ...infixResult.steps.map(step => ({
+                        ...step,
+                        action: "Postfix to Infix: " + step.action
+                    })),
+                    ...prefixResult.steps.map(step => ({
+                        ...step,
+                        action: "Infix to Prefix: " + step.action
+                    }))
+                ]
+            };
+        }
+
+        function prefixToPostfixWithSteps(prefix) {
+            const infixResult = prefixToInfixWithSteps(prefix);
+            const postfixResult = infixToPostfixWithSteps(infixResult.result);
+            
+            return {
+                result: postfixResult.result,
+                steps: [
+                    ...infixResult.steps.map(step => ({
+                        ...step,
+                        action: "Prefix to Infix: " + step.action
+                    })),
+                    ...postfixResult.steps.map(step => ({
+                        ...step,
+                        action: "Infix to Postfix: " + step.action
+                    }))
+                ]
+            };
+        }
+
+        // Evaluation functions
+        function evaluatePostfixWithSteps(postfix) {
+            const stack = [];
+            const steps = [];
+            let i = 0;
+            
+            while (i < postfix.length) {
+                const c = postfix[i];
+                
+                if (c === ' ') {
+                    i++;
+                    continue;
+                }
+                
+                if (isOperand(c)) {
+                    // Handle multi-digit numbers
+                    let numStr = '';
+                    while (i < postfix.length && (isOperand(postfix[i]) || postfix[i] === '.')) {
+                        numStr += postfix[i];
+                        i++;
+                    }
+                    
+                    const num = parseFloat(numStr);
+                    if (isNaN(num)) throw new Error(`Invalid number: ${numStr}`);
+                    
+                    stack.push(num);
+                    steps.push({
+                        symbol: numStr,
+                        stack: stack.slice().join(', '),
+                        action: "Push operand to stack"
+                    });
+                } 
+                else if (isOperator(c)) {
+                    if (stack.length < 2) throw new Error("Invalid postfix expression");
+                    
+                    const b = stack.pop();
+                    const a = stack.pop();
+                    let result;
+                    
+                    switch (c) {
+                        case '+': result = a + b; break;
+                        case '-': result = a - b; break;
+                        case '*': result = a * b; break;
+                        case '/': 
+                            if (b === 0) throw new Error("Division by zero");
+                            result = a / b; 
+                            break;
+                        case '^': result = Math.pow(a, b); break;
+                        default: throw new Error(`Unsupported operator: ${c}`);
+                    }
+                    
+                    stack.push(result);
+                    steps.push({
+                        symbol: c,
+                        stack: stack.join(', '),
+                        action: `${a} ${c} ${b} = ${result}`
+                    });
+                    i++;
+                } 
+                else {
+                    throw new Error(`Invalid character: ${c}`);
+                }
+            }
+            
+            if (stack.length !== 1) throw new Error("Invalid postfix expression");
+            
+            return {
+                result: stack[0],
+                steps: steps
+            };
+        }
+
+        function evaluatePrefixWithSteps(prefix) {
+            const stack = [];
+            const steps = [];
+            let i = prefix.length - 1;
+            
+            while (i >= 0) {
+                const c = prefix[i];
+                
+                if (c === ' ') {
+                    i--;
+                    continue;
+                }
+                
+                if (isOperand(c)) {
+                    // Handle multi-digit numbers (reading backwards)
+                    let numStr = '';
+                    while (i >= 0 && (isOperand(prefix[i]) || prefix[i] === '.')) {
+                        numStr = prefix[i] + numStr;
+                        i--;
+                    }
+                    
+                    const num = parseFloat(numStr);
+                    if (isNaN(num)) throw new Error(`Invalid number: ${numStr}`);
+                    
+                    stack.push(num);
+                    steps.push({
+                        symbol: numStr,
+                        stack: stack.slice().join(', '),
+                        action: "Push operand to stack"
+                    });
+                } 
+                else if (isOperator(c)) {
+                    if (stack.length < 2) throw new Error("Invalid prefix expression");
+                    
+                    const a = stack.pop();
+                    const b = stack.pop();
+                    let result;
+                    
+                    switch (c) {
+                        case '+': result = a + b; break;
+                        case '-': result = a - b; break;
+                        case '*': result = a * b; break;
+                        case '/': 
+                            if (b === 0) throw new Error("Division by zero");
+                            result = a / b; 
+                            break;
+                        case '^': result = Math.pow(a, b); break;
+                        default: throw new Error(`Unsupported operator: ${c}`);
+                    }
+                    
+                    stack.push(result);
+                    steps.push({
+                        symbol: c,
+                        stack: stack.join(', '),
+                        action: `${a} ${c} ${b} = ${result}`
+                    });
+                    i--;
+                } 
+                else {
+                    throw new Error(`Invalid character: ${c}`);
+                }
+            }
+            
+            if (stack.length !== 1) throw new Error("Invalid prefix expression");
+            
+            return {
+                result: stack[0],
+                steps: steps
+            };
+        }
+
+        function evaluateInfixWithSteps(infix) {
+            const postfixResult = infixToPostfixWithSteps(infix);
+            const evalResult = evaluatePostfixWithSteps(postfixResult.result);
+            
+            return {
+                result: evalResult.result,
+                steps: [
+                    ...postfixResult.steps.map(step => ({
+                        ...step,
+                        action: "Conversion: " + step.action
+                    })),
+                    ...evalResult.steps.map(step => ({
+                        ...step,
+                        action: "Evaluation: " + step.action
+                    }))
+                ]
+            };
+        }
+
+        // Display functions
+        function displayConversionSteps(steps, title, description, headers) {
+            const container = document.getElementById('steps-content');
+            container.innerHTML = '';
+            
+            const heading = document.createElement('h3');
+            heading.textContent = title;
+            container.appendChild(heading);
+            
+            const desc = document.createElement('p');
+            desc.textContent = description;
+            container.appendChild(desc);
+            
+            const table = document.createElement('table');
+            table.className = 'step-table';
+            
+            // Header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Body
+            const tbody = document.createElement('tbody');
+            steps.forEach(step => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    const propName = header.toLowerCase().replace(' ', '_');
+                    td.textContent = step[propName] || '';
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
+
+        function displayEvaluationSteps(steps, title, description, headers) {
+            const container = document.getElementById('eval-steps-content');
+            container.innerHTML = '';
+            
+            const heading = document.createElement('h3');
+            heading.textContent = title;
+            container.appendChild(heading);
+            
+            const desc = document.createElement('p');
+            desc.textContent = description;
+            container.appendChild(desc);
+            
+            const table = document.createElement('table');
+            table.className = 'step-table';
+            
+            // Header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Body
+            const tbody = document.createElement('tbody');
+            steps.forEach(step => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    const propName = header.toLowerCase().replace(' ', '_');
+                    td.textContent = step[propName] || '';
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
+
+        // Variable handling
+        function generateVariableInputs() {
+            const expression = document.getElementById('eval-expression').value.trim();
+            const container = document.getElementById('variable-inputs');
+            container.innerHTML = '';
+            
+            if (!expression) return;
+            
+            // Find all variables (letters) in the expression
+            const variables = new Set();
+            for (const char of expression) {
+                if (/[a-zA-Z]/.test(char)) variables.add(char);
+            }
+            
+            // Create input for each variable
+            variables.forEach(variable => {
+                const pairDiv = document.createElement('div');
+                pairDiv.className = 'value-pair';
+                
+                const label = document.createElement('label');
+                label.textContent = `${variable} =`;
+                label.htmlFor = `var-${variable}`;
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `var-${variable}`;
+                input.className = 'variable-value';
+                input.dataset.var = variable;
+                input.step = 'any';
+                
+                pairDiv.appendChild(label);
+                pairDiv.appendChild(input);
+                container.appendChild(pairDiv);
+            });
+        }
+
+        function substituteVariables(expr, varValues) {
+            let result = '';
+            let i = 0;
+            
+            while (i < expr.length) {
+                const c = expr[i];
+                
+                if (/[a-zA-Z]/.test(c)) {
+                    // It's a variable
+                    if (varValues.hasOwnProperty(c)) {
+                        result += varValues[c];
+                    } else {
+                        throw new Error(`No value provided for variable '${c}'`);
+                    }
+                    i++;
+                } else {
+                    // It's an operator, parenthesis, or space
+                    result += c;
+                    i++;
+                }
+            }
+            
+            return result;
+        }
+
+        // Event listeners
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.value-panel').forEach(panel => panel.classList.remove('active'));
+                document.getElementById(this.getAttribute('data-panel')).classList.add('active');
+            });
+        });
+
+        document.getElementById('show-steps').addEventListener('change', function() {
+            document.getElementById('steps-section').classList.toggle('hide-section', !this.checked);
+        });
+
+        document.getElementById('convert').addEventListener('click', function() {
+            try {
+                const expression = document.getElementById('expression').value.trim();
+                const inputFormat = document.getElementById('input-format').value;
+                const outputFormat = document.getElementById('output-format').value;
+                const showSteps = document.getElementById('show-steps').checked;
+                
+                if (!expression) throw new Error("Please enter an expression");
+                
+                // Reset UI
+                document.getElementById('error').textContent = "";
+                document.getElementById('infix-result').textContent = "-";
+                document.getElementById('postfix-result').textContent = "-";
+                document.getElementById('prefix-result').textContent = "-";
+                document.getElementById('steps-content').innerHTML = "";
+                
+                let result, steps, title, description, headers;
+                
+                // Handle each conversion case separately
+                if (inputFormat === 'infix' && outputFormat === 'postfix') {
+                    const conversion = infixToPostfixWithSteps(expression);
+                    result = conversion.result;
+                    steps = conversion.steps;
+                    title = "Infix to Postfix Conversion";
+                    description = "Converting infix to postfix using stack algorithm";
+                    headers = ["Symbol", "Output", "Stack", "Action"];
+                    document.getElementById('postfix-result').textContent = result;
+                }
+                else if (inputFormat === 'infix' && outputFormat === 'prefix') {
+                    const conversion = infixToPrefixWithSteps(expression);
+                    result = conversion.result;
+                    steps = conversion.steps;
+                    title = "Infix to Prefix Conversion";
+                    description = "Converting infix to prefix via postfix";
+                    headers = ["Symbol", "Output", "Stack", "Action"];
+                    document.getElementById('prefix-result').textContent = result;
+                }
+                else if (inputFormat === 'postfix' && outputFormat === 'infix') {
+                    const conversion = postfixToInfixWithSteps(expression);
+                    result = conversion.result;
+                    steps = conversion.steps;
+                    title = "Postfix to Infix Conversion";
+                    description = "Converting postfix to infix using stack";
+                    headers = ["Symbol", "Stack", "Action"];
+                    document.getElementById('infix-result').textContent = result;
+                }
+                else if (inputFormat === 'postfix' && outputFormat === 'prefix') {
+                    const conversion = postfixToPrefixWithSteps(expression);
+                    result = conversion.result;
+                    steps = conversion.steps;
+                    title = "Postfix to Prefix Conversion";
+                    description = "Converting postfix to prefix via infix";
+                    headers = ["Symbol", "Stack/Output", "Action"];
+                    document.getElementById('prefix-result').textContent = result;
+                }
+                else if (inputFormat === 'prefix' && outputFormat === 'infix') {
+                    const conversion = prefixToInfixWithSteps(expression);
+                    result = conversion.result;
+                    steps = conversion.steps;
+                    title = "Prefix to Infix Conversion";
+                    description = "Converting prefix to infix using stack";
+                    headers = ["Symbol", "Stack", "Action"];
+                    document.getElementById('infix-result').textContent = result;
+                }
+                else if (inputFormat === 'prefix' && outputFormat === 'postfix') {
+                    const conversion = prefixToPostfixWithSteps(expression);
+                    result = conversion.result;
+                    steps = conversion.steps;
+                    title = "Prefix to Postfix Conversion";
+                    description = "Converting prefix to postfix via infix";
+                    headers = ["Symbol", "Stack/Output", "Action"];
+                    document.getElementById('postfix-result').textContent = result;
+                }
+                else if (outputFormat === 'all') {
+                    // Handle all conversions
+                    if (inputFormat === 'infix') {
+                        const postfix = infixToPostfixWithSteps(expression);
+                        const prefix = infixToPrefixWithSteps(expression);
+                        document.getElementById('postfix-result').textContent = postfix.result;
+                        document.getElementById('prefix-result').textContent = prefix.result;
+                        document.getElementById('infix-result').textContent = expression;
+                        
+                        if (showSteps) {
+                            displayConversionSteps(
+                                postfix.steps,
+                                "Infix to Postfix Conversion",
+                                "Converting infix to postfix using stack algorithm",
+                                ["Symbol", "Output", "Stack", "Action"]
+                            );
+                            
+                            // Add separator
+                            const sep = document.createElement('hr');
+                            document.getElementById('steps-content').appendChild(sep);
+                            
+                            displayConversionSteps(
+                                prefix.steps,
+                                "Infix to Prefix Conversion",
+                                "Converting infix to prefix via postfix",
+                                ["Symbol", "Output", "Stack", "Action"]
+                            );
+                        }
+                    }
+                    else if (inputFormat === 'postfix') {
+                        const infix = postfixToInfixWithSteps(expression);0
+                        const prefix = postfixToPrefixWithSteps(expression);
+                        document.getElementById('infix-result').textContent = infix.result;
+                        document.getElementById('prefix-result').textContent = prefix.result;
+                        document.getElementById('postfix-result').textContent = expression;
+                        
+                        if (showSteps) {
+                            displayConversionSteps(
+                                infix.steps,
+                                "Postfix to Infix Conversion",
+                                "Converting postfix to infix using stack",
+                                ["Symbol", "Stack", "Action"]
+                            );
+                            
+                            const sep = document.createElement('hr');
+                            document.getElementById('steps-content').appendChild(sep);
+                            
+                            displayConversionSteps(
+                                prefix.steps,
+                                "Postfix to Prefix Conversion",
+                                "Converting postfix to prefix via infix",
+                                ["Symbol", "Stack/Output", "Action"]
+                            );
+                        }
+                    }
+                    else if (inputFormat === 'prefix') {
+                        const infix = prefixToInfixWithSteps(expression);
+                        const postfix = prefixToPostfixWithSteps(expression);
+                        document.getElementById('infix-result').textContent = infix.result;
+                        document.getElementById('postfix-result').textContent = postfix.result;
+                        document.getElementById('prefix-result').textContent = expression;
+                        
+                        if (showSteps) {
+                            displayConversionSteps(
+                                infix.steps,
+                                "Prefix to Infix Conversion",
+                                "Converting prefix to infix using stack",
+                                ["Symbol", "Stack", "Action"]
+                            );
+                            
+                            const sep = document.createElement('hr');
+                            document.getElementById('steps-content').appendChild(sep);
+                            
+                            displayConversionSteps(
+                                postfix.steps,
+                                "Prefix to Postfix Conversion",
+                                "Converting prefix to postfix via infix",
+                                ["Symbol", "Stack/Output", "Action"]
+                            );
+                        }
+                    }
+                    
+                    // Show all result rows
+                    document.getElementById('infix-row').style.display = 'table-row';
+                    document.getElementById('postfix-row').style.display = 'table-row';
+                    document.getElementById('prefix-row').style.display = 'table-row';
+                    
+                    // Early return since we've handled the 'all' case
+                    if (showSteps) {
+                        document.getElementById('steps-section').classList.remove('hide-section');
+                    } else {
+                        document.getElementById('steps-section').classList.add('hide-section');
+                    }
+                    return;
+                }
+                
+                // Show the appropriate result row
+                if (outputFormat === 'postfix') {
+                    document.getElementById('postfix-row').style.display = 'table-row';
+                    document.getElementById('infix-row').style.display = 'none';
+                    document.getElementById('prefix-row').style.display = 'none';
+                }
+                else if (outputFormat === 'prefix') {
+                    document.getElementById('prefix-row').style.display = 'table-row';
+                    document.getElementById('infix-row').style.display = 'none';
+                    document.getElementById('postfix-row').style.display = 'none';
+                }
+                else if (outputFormat === 'infix') {
+                    document.getElementById('infix-row').style.display = 'table-row';
+                    document.getElementById('postfix-row').style.display = 'none';
+                    document.getElementById('prefix-row').style.display = 'none';
+                }
+                
+                // Show steps if requested
+                if (showSteps && steps) {
+                    document.getElementById('steps-section').classList.remove('hide-section');
+                    displayConversionSteps(steps, title, description, headers);
+                } else {
+                    document.getElementById('steps-section').classList.add('hide-section');
+                }
+                
+            } catch (error) {
+                document.getElementById('error').textContent = error.message;
+            }
+        });
+
+        document.getElementById('eval-expression').addEventListener('input', generateVariableInputs);
+        document.getElementById('eval-format').addEventListener('change', generateVariableInputs);
+
+        document.getElementById('evaluate').addEventListener('click', function() {
+            try {
+                const expression = document.getElementById('eval-expression').value.trim();
+                const format = document.getElementById('eval-format').value;
+                
+                if (!expression) throw new Error("Please enter an expression");
+                
+                // Reset UI
+                document.getElementById('eval-error').textContent = "";
+                document.getElementById('expression-display').textContent = expression;
+                document.getElementById('evaluation-result').textContent = "-";
+                document.getElementById('eval-steps-content').innerHTML = "";
+                
+                // Get variable values
+                const varValues = {};
+                document.querySelectorAll('.variable-value').forEach(input => {
+                    const varName = input.dataset.var;
+                    const value = input.value.trim();
+                    
+                    if (value === '') throw new Error(`Please enter a value for variable '${varName}'`);
+                    varValues[varName] = parseFloat(value);
+                });
+                
+                // Substitute variables
+                const substituted = substituteVariables(expression, varValues);
+                let evalResult;
+                
+                // Evaluate based on format
+                switch(format) {
+                    case 'infix':
+                        evalResult = evaluateInfixWithSteps(substituted);
+                        break;
+                    case 'postfix':
+                        evalResult = evaluatePostfixWithSteps(substituted);
+                        break;
+                    case 'prefix':
+                        evalResult = evaluatePrefixWithSteps(substituted);
+                        break;
+                    default:
+                        throw new Error("Invalid evaluation format");
+                }
+                
+                // Display results
+                document.getElementById('evaluation-result').textContent = evalResult.result;
+                
+                // Display steps
+                displayEvaluationSteps(
+                    evalResult.steps,
+                    format === 'infix' ? "Infix Evaluation Steps" : 
+                    format === 'postfix' ? "Postfix Evaluation Steps" : "Prefix Evaluation Steps",
+                    format === 'infix' ? "First converted to postfix, then evaluated" :
+                    format === 'postfix' ? "Evaluated from left to right" : "Evaluated from right to left",
+                    ["Symbol", "Stack", "Action"]
+                );
+                document.getElementById('eval-steps-section').classList.remove('hide-section');
+                
+            } catch (error) {
+                document.getElementById('eval-error').textContent = error.message;
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('expression').value = "a+b*c";
+            document.getElementById('eval-expression').value = "a+b*c";
+            generateVariableInputs();
+        });
+    </script>
+    

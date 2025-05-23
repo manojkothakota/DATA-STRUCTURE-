@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrays | DSA Visualizer | RELU Club</title>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --accent: #ff2d75;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--light) 0%, #e6f2ff 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.05) 50%, 
+                rgba(255,255,255,0.1) 100%);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-main {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, white, #f3f3f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .logo-sub {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: -0.5rem;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        nav {
+            background-color: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        nav li {
+            margin: 0 1.5rem;
+            position: relative;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .content-section h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .content-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        }
+        
+        .visualization-container {
+            width: 100%;
+            min-height: 300px;
+            background: rgba(106, 17, 203, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .array-container {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .array-element {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 5px;
+            margin: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .array-element.index {
+            position: absolute;
+            top: -25px;
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .array-element.highlight {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 45, 117, 0.4);
+        }
+        
+        .array-element.access {
+            background: #2575fc;
+            color: white;
+        }
+        
+        .array-element.insert {
+            background: #00b09b;
+            color: white;
+        }
+        
+        .array-element.delete {
+            background: #ff8a00;
+            color: white;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            margin: 0 1rem;
+        }
+        
+        .control-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn.reset {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+        
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .complexity-table th, .complexity-table td {
+            border: 1px solid #ddd;
+            padding: 0.8rem;
+            text-align: left;
+        }
+        
+        .complexity-table th {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .complexity-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .footer-sub {
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            opacity: 0.7;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 0 0.5rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                margin: 0.5rem 0;
+            }
+            
+            .page-header h2 {
+                font-size: 2rem;
+            }
+            
+            .logo-main {
+                font-size: 2.5rem;
+            }
+            
+            .array-element {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-group {
+                width: 100%;
+                max-width: 300px;
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-main">DSA Visualizer</div>
+                <div class="logo-sub">RELU CLUB</div>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="subtopics.html">Topics</a></li>
+            <li><a href="about.html">About RELU</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <section class="page-header">
+            <h2>Arrays</h2>
+            <p>Contiguous memory locations storing elements of the same type with random access capability.</p>
+        </section>
+        
+        <section class="content-section">
+            <h3>Introduction</h3>
+            <p>An array is a collection of items stored at contiguous memory locations. The idea is to store multiple items of the same type together. This makes it easier to calculate the position of each element by simply adding an offset to a base value, i.e., the memory location of the first element of the array (generally denoted by the name of the array).</p>
+            
+            <div class="visualization-container">
+                <h4>Interactive Array Visualization</h4>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="arraySize">Array Size:</label>
+                        <input type="number" id="arraySize" min="3" max="15" value="8">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="operation">Operation:</label>
+                        <select id="operation">
+                            <option value="access">Access Element</option>
+                            <option value="insert">Insert Element</option>
+                            <option value="delete">Delete Element</option>
+                            <option value="search">Search Element</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group" id="indexGroup">
+                        <label for="elementIndex">Index:</label>
+                        <input type="number" id="elementIndex" min="0" value="0">
+                    </div>
+                    
+                    <div class="control-group" id="valueGroup" style="display: none;">
+                        <label for="elementValue">Value:</label>
+                        <input type="number" id="elementValue" value="10">
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="executeBtn">Execute Operation</button>
+                    <button class="btn reset" id="resetBtn">Reset Array</button>
+                    <button class="btn" id="randomizeBtn">Randomize Values</button>
+                </div>
+                
+                <div class="array-container" id="arrayVisualization">
+                    <!-- Array elements will be generated by JavaScript -->
+                </div>
+                
+                <div id="operationExplanation" style="text-align: center; margin-top: 1rem; font-style: italic; color: #666;">
+                    Select an operation to visualize
+                </div>
+            </div>
+        </section>
+        
+        <section class="content-section">
+            <h3>Array Operations</h3>
+            <p>Arrays support various fundamental operations that can be performed on them:</p>
+            
+            <table class="complexity-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Description</th>
+                        <th>Time Complexity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Access</td>
+                        <td>Accessing an element at a specific index</td>
+                        <td>O(1)</td>
+                    </tr>
+                    <tr>
+                        <td>Search</td>
+                        <td>Finding an element by value (unsorted array)</td>
+                        <td>O(n)</td>
+                    </tr>
+                    <tr>
+                        <td>Insertion</td>
+                        <td>Adding an element at a specific index</td>
+                        <td>O(n)</td>
+                    </tr>
+                    <tr>
+                        <td>Deletion</td>
+                        <td>Removing an element from a specific index</td>
+                        <td>O(n)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section class="content-section">
+            <h3>Characteristics of Arrays</h3>
+            <ul style="line-height: 2; padding-left: 1.5rem;">
+                <li><strong>Fixed Size:</strong> The size of an array is fixed at the time of creation and cannot be changed dynamically.</li>
+                <li><strong>Homogeneous Elements:</strong> All elements in an array must be of the same type.</li>
+                <li><strong>Contiguous Memory:</strong> Array elements are stored in contiguous memory locations.</li>
+                <li><strong>Random Access:</strong> We can access any element randomly using the array index.</li>
+                <li><strong>Cache Friendliness:</strong> Arrays have better cache locality which can significantly improve performance.</li>
+            </ul>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">DSA Visualizer</div>
+            <div class="footer-sub">RELU CLUB</div>
+            
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="subtopics.html">Topics</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2023 DSA Visualizer | Developed by RELU Club. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const arrayVisualization = document.getElementById('arrayVisualization');
+        const arraySizeInput = document.getElementById('arraySize');
+        const operationSelect = document.getElementById('operation');
+        const elementIndexInput = document.getElementById('elementIndex');
+        const elementValueInput = document.getElementById('elementValue');
+        const indexGroup = document.getElementById('indexGroup');
+        const valueGroup = document.getElementById('valueGroup');
+        const executeBtn = document.getElementById('executeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+        const operationExplanation = document.getElementById('operationExplanation');
+        
+        // Array state
+        let array = [];
+        let arraySize = 8;
+        
+        // Initialize the array
+        function initArray() {
+            array = [];
+            arrayVisualization.innerHTML = '';
+            
+            for (let i = 0; i < arraySize; i++) {
+                array.push(Math.floor(Math.random() * 100) + 1);
+                
+                const element = document.createElement('div');
+                element.className = 'array-element';
+                element.textContent = array[i];
+                element.dataset.index = i;
+                
+                const indexLabel = document.createElement('div');
+                indexLabel.className = 'index';
+                indexLabel.textContent = i;
+                element.appendChild(indexLabel);
+                
+                arrayVisualization.appendChild(element);
+            }
+            
+            updateIndexInputMax();
+            operationExplanation.textContent = 'Select an operation to visualize';
+        }
+        
+        // Update the max value for index input
+        function updateIndexInputMax() {
+            elementIndexInput.max = arraySize - 1;
+            if (parseInt(elementIndexInput.value) > arraySize - 1) {
+                elementIndexInput.value = arraySize - 1;
+            }
+        }
+        
+        // Randomize array values
+        function randomizeArray() {
+            for (let i = 0; i < arraySize; i++) {
+                array[i] = Math.floor(Math.random() * 100) + 1;
+                arrayVisualization.children[i].textContent = array[i];
+                resetElementStyles(arrayVisualization.children[i]);
+            }
+            operationExplanation.textContent = 'Array values randomized';
+        }
+        
+        // Reset all element styles
+        function resetElementStyles(element) {
+            element.className = 'array-element';
+            const indexLabel = document.createElement('div');
+            indexLabel.className = 'index';
+            indexLabel.textContent = element.dataset.index;
+            element.appendChild(indexLabel);
+        }
+        
+        // Reset all elements to default state
+        function resetAllElements() {
+            const elements = arrayVisualization.children;
+            for (let i = 0; i < elements.length; i++) {
+                resetElementStyles(elements[i]);
+            }
+        }
+        
+        // Highlight an element
+        function highlightElement(index, className) {
+            const element = arrayVisualization.children[index];
+            resetElementStyles(element);
+            element.classList.add(className);
+        }
+        
+        // Execute the selected operation
+        function executeOperation() {
+            const operation = operationSelect.value;
+            const index = parseInt(elementIndexInput.value);
+            const value = parseInt(elementValueInput.value);
+            
+            resetAllElements();
+            
+            switch(operation) {
+                case 'access':
+                    highlightElement(index, 'access');
+                    operationExplanation.textContent = `Accessing element at index ${index}: Value = ${array[index]}`;
+                    break;
+                    
+                case 'insert':
+                    if (index >= 0 && index <= arraySize) {
+                        // Visualize the shift for insertion
+                        for (let i = arraySize - 1; i >= index; i--) {
+                            setTimeout(() => {
+                                highlightElement(i, 'insert');
+                                arrayVisualization.children[i].textContent = array[i-1] || '';
+                            }, (arraySize - i) * 300);
+                        }
+                        
+                        setTimeout(() => {
+                            highlightElement(index, 'insert');
+                            arrayVisualization.children[index].textContent = value;
+                            operationExplanation.textContent = `Inserting value ${value} at index ${index} would shift elements to the right`;
+                        }, (arraySize - index + 1) * 300);
+                    }
+                    break;
+                    
+                case 'delete':
+                    if (index >= 0 && index < arraySize) {
+                        highlightElement(index, 'delete');
+                        
+                        // Visualize the shift for deletion
+                        for (let i = index; i < arraySize - 1; i++) {
+                            setTimeout(() => {
+                                highlightElement(i, 'delete');
+                                arrayVisualization.children[i].textContent = array[i+1];
+                            }, (i - index + 1) * 300);
+                        }
+                        
+                        setTimeout(() => {
+                            operationExplanation.textContent = `Deleting element at index ${index} would shift elements to the left`;
+                        }, (arraySize - index + 1) * 300);
+                    }
+                    break;
+                    
+                case 'search':
+                    let found = false;
+                    for (let i = 0; i < arraySize; i++) {
+                        setTimeout(() => {
+                            highlightElement(i, 'access');
+                            if (array[i] === value) {
+                                highlightElement(i, 'highlight');
+                                operationExplanation.textContent = `Value ${value} found at index ${i}`;
+                                found = true;
+                            } else if (i === arraySize - 1 && !found) {
+                                operationExplanation.textContent = `Value ${value} not found in the array`;
+                            }
+                        }, i * 300);
+                    }
+                    break;
+            }
+        }
+        
+        // Event Listeners
+        arraySizeInput.addEventListener('change', function() {
+            arraySize = parseInt(this.value);
+            initArray();
+        });
+        
+        operationSelect.addEventListener('change', function() {
+            if (this.value === 'insert' || this.value === 'search') {
+                valueGroup.style.display = 'block';
+            } else {
+                valueGroup.style.display = 'none';
+            }
+            
+            if (this.value === 'search') {
+                indexGroup.style.display = 'none';
+            } else {
+                indexGroup.style.display = 'block';
+            }
+        });
+        
+        executeBtn.addEventListener('click', executeOperation);
+        resetBtn.addEventListener('click', initArray);
+        randomizeBtn.addEventListener('click', randomizeArray);
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initArray();
+            
+            // Typewriter effect for page header
+            const pageHeader = document.querySelector('.page-header h2');
+            const originalText = pageHeader.textContent;
+            pageHeader.textContent = '';
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < originalText.length) {
+                    pageHeader.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                }
+            }
+            
+            typeWriter();
+        });
+    </script>
+</body>
+</html>

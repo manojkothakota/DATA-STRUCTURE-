@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>DSA Portal | RELU Club</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc 80%);
+      color: #222;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+    .navbar {
+      background: rgba(30,30,60,0.92);
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0.8rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      box-shadow: 0 2px 10px rgba(30,60,100,0.10);
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 1.08rem;
+      padding: 0.4rem 1.2rem;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .navbar a:hover, .navbar a.active {
+      background: #2e8bfa;
+      color: #fff;
+    }
+    header {
+      text-align: center;
+      padding: 2.2rem 0 1.2rem 0;
+      background: linear-gradient(90deg, #2e8bfa 70%, #6dd5ed 100%);
+      color: #fff;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(30,60,100,0.1);
+      animation: fadeInDown 1s;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      letter-spacing: 2px;
+      animation: fadeInDown 1s;
+    }
+    header p {
+      font-size: 1.1rem;
+      margin-top: 8px;
+      opacity: 0.94;
+      animation: fadeInDown 1.3s;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    section {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(30,60,100,0.09);
+      padding: 40px 44px 30px 44px;
+      animation: fadeIn 1.2s;
+      color: #222;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    h2 {
+      color: #2e8bfa;
+      margin-top: 0;
+      font-size: 2rem;
+      border-left: 6px solid #2e8bfa;
+      padding-left: 12px;
+      border-radius: 6px;
+      margin-bottom: 24px;
+    }
+    h3 {
+      color: #1a5eaa;
+      margin-top: 32px;
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    ul, ol {
+      margin-left: 22px;
+      margin-bottom: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 22px 0;
+      background: #f8fbff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(30,60,100,0.05);
+    }
+    th, td {
+      padding: 13px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e3eaf2;
+    }
+    th {
+      
+      color: #2e8bfa;
+      font-weight: 600;
+    }
+    code, pre {
+      background: #f4f7fa;
+      padding: 7px 14px;
+      border-radius: 6px;
+      color: #1a5eaa;
+      font-size: 1em;
+      display: block;
+      margin: 14px 0;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      overflow-x: auto;
+    }
+    .highlight {
+      background: #eaf6ff;
+      border-left: 4px solid #2e8bfa;
+      padding: 10px 18px;
+      border-radius: 6px;
+      margin: 18px 0;
+      font-size: 1.08em;
+    }
+    .animated-box {
+      background: #f0f8ff;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      box-shadow: 0 2px 10px rgba(46,139,250,0.07);
+      transition: box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .animated-box:hover {
+      box-shadow: 0 4px 24px rgba(46,139,250,0.18);
+      background: #eaf6ff;
+    }
+    .js-animate {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.7s cubic-bezier(.23,1.02,.85,1);
+    }
+    .js-animate.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .graph-img {
+      display: block;
+      margin: 30px auto 10px auto;
+      border: 3px solid #2e8bfa;
+      border-radius: 10px;
+      width: 380px;
+      height: 220px;
+      background: #eaf6ff url('https://learnloner.com/wp-content/uploads/2023/04/Asymptoyic-Notations.png') center/contain no-repeat;
+      box-shadow: 0 2px 12px rgba(46,139,250,0.12);
+    }
+    .note {
+      font-size: 0.98em;
+      color: #666;
+      margin: 10px 0 0 0;
+      padding-left: 10px;
+      border-left: 3px solid #2e8bfa;
+    }
+    .table-scroll {
+      overflow-x: auto;
+    }
+    /* Data Structures Card Style */
+    .card {
+      background: rgba(255, 255, 255, 0.13);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease;
+      color: #fff;
+    }
+    .card h2, .card h3, .card th, .card td, .card ul, .card li {
+      color: #fff !important;
+    }
+    .card table {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border-radius: 10px;
+    }
+    .card th, .card td {
+      border-bottom: 1px solid #fff;
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.95rem;
+      background: rgba(0, 0, 0, 0.32);
+      color: #fff;
+      width: 100%;
+      margin-top: 40px;
+    }
+    /* Responsive */
+    @media (max-width: 700px) {
+      section { padding: 20px 5vw; }
+      .graph-img { width: 98vw; height: 160px;}
+      .card { padding: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DSA Learning Portal</h1>
+    <p>Organize, manage, and analyze data efficiently – Powered by <strong>RELU Club</strong></p>
+  </header>
+  <nav class="navbar">
+    <a href="#ds" class="active" onclick="setActive(this)">Data Structures</a>
+    <a href="#daa" onclick="setActive(this)">Algorithms & Analysis</a>
+  </nav>
+  <!-- Data Structures Section -->
+  <section id="ds" class="card">
+    <h2>🧠 Introduction to Data Structures</h2>
+    <p>Organize, manage, and store data efficiently using powerful structures.</p>
+    <h2>🔹 Primitive Data Structures</h2>
+    <p>Basic data types built into programming languages, storing single values.</p>
+    <table>
+      <tr><th>Data Type</th><th>Description</th></tr>
+      <tr><td>int</td><td>Stores integer values (e.g., 5, -10)</td></tr>
+      <tr><td>float</td><td>Stores decimal values (e.g., 3.14, -2.5)</td></tr>
+      <tr><td>char</td><td>Stores a single character (e.g., 'A', 'z')</td></tr>
+      <tr><td>double</td><td>Stores large decimal values with double precision</td></tr>
+    </table>
+    <h2>🔸 Non-Primitive Data Structures</h2>
+    <p>Built using primitive types to handle complex data and relationships.</p>
+    <h3>1️⃣ Linear Data Structures</h3>
+    <ul>
+      <li><strong>Array</strong> – Contiguous memory, index-based access.</li>
+      <li><strong>Linked List</strong> – Nodes with data and pointers.</li>
+      <li><strong>Stack</strong> – LIFO structure, operates at one end (top).</li>
+      <li><strong>Queue</strong> – FIFO structure, operates at front and rear.</li>
+    </ul>
+    <h3>2️⃣ Non-Linear Data Structures</h3>
+    <ul>
+      <li><strong>Tree</strong> – Hierarchical, root and children nodes.</li>
+      <li><strong>Graph</strong> – Nodes (vertices) and connections (edges).</li>
+      <li><strong>Heap</strong> – Specialized tree used for priority queues.</li>
+    </ul>
+  </section>
+
+  <!-- Algorithms and Analysis Section -->
+  <section id="daa">
+    <h2>Design and Analysis of Algorithms</h2>
+    <p style="color:#444;">Comprehensive Notes with Examples, Visuals, and Interactive Animations</p>
+    <h2>What is an Algorithm?</h2>
+    <div class="animated-box js-animate">
+      <p>
+        An <b>algorithm</b> is a finite set of precise instructions for performing a computation or solving a problem. 
+        It is a well-defined computational procedure that takes some value(s) as input and produces value(s) as output.
+      </p>
+      <ul>
+        <li>Sequence of computational steps transforming input to output.</li>
+        <li>Must be clear, unambiguous, and finite.</li>
+        <li>Solves a class of problems, not just a single instance.</li>
+      </ul>
+      <div class="highlight">
+        <b>Example:</b> Making tea: Add water and milk, boil, add tea leaves, add sugar, serve.
+      </div>
+    </div>
+
+    <h2>Properties of Algorithms</h2>
+    <div class="animated-box js-animate">
+      <table>
+        <tr>
+          <th>Property</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>Input</td>
+          <td>Takes zero or more inputs from a specified set.</td>
+        </tr>
+        <tr>
+          <td>Output</td>
+          <td>Produces at least one output, related to the input.</td>
+        </tr>
+        <tr>
+          <td>Definiteness</td>
+          <td>Every step is clear and unambiguous.</td>
+        </tr>
+        <tr>
+          <td>Correctness</td>
+          <td>Produces correct output for every valid input.</td>
+        </tr>
+        <tr>
+          <td>Finiteness</td>
+          <td>Terminates after a finite number of steps.</td>
+        </tr>
+        <tr>
+          <td>Effectiveness</td>
+          <td>Each step is basic and can be carried out in finite time.</td>
+        </tr>
+        <tr>
+          <td>Generality</td>
+          <td>Solves a class of problems, not just a single instance.</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Algorithm Examples</h2>
+    <div class="animated-box js-animate">
+      <h3>Finding Maximum in a Sequence</h3>
+      <pre>
+procedure max(a1, a2, ..., an: integers)
+    max := a1
+    for i := 2 to n
+        if max &lt; ai then
+            max := ai
+    {max is the largest element}
+      </pre>
+      <h3>Linear Search</h3>
+      <pre>
+procedure linear_search(x: integer; a1, a2, ..., an: integers)
+    i := 1
+    while (i ≤ n and x ≠ ai)
+        i := i + 1
+    if i ≤ n then
+        location := i
+    else
+        location := 0
+    {location is the subscript of the term that equals x, or is zero if x is not found}
+      </pre>
+      <h3>Binary Search (for sorted sequences)</h3>
+      <pre>
+procedure binary_search(x: integer; a1, a2, ..., an: integers)
+    i := 1
+    j := n
+    while (i &lt; j)
+        m := floor((i + j)/2)
+        if x &gt; am then
+            i := m + 1
+        else
+            j := m
+    if x = ai then
+        location := i
+    else
+        location := 0
+      </pre>
+    </div>
+
+    <h2>Complexity of Algorithms</h2>
+    <div class="animated-box js-animate">
+      <ul>
+        <li><b>Time Complexity:</b> Amount of time an algorithm takes to run, as a function of input size <i>n</i>.</li>
+        <li><b>Space Complexity:</b> Amount of memory required by an algorithm as a function of input size.</li>
+        <li><b>Communication Complexity:</b> (For distributed/parallel algorithms) Measures time taken for communication over a network.</li>
+      </ul>
+      <div class="highlight">
+        <b>Types of Complexity:</b>
+        <ul>
+          <li>Constant Time: O(1)</li>
+          <li>Linear Time: O(n)</li>
+          <li>Logarithmic Time: O(log n)</li>
+          <li>Quadratic Time: O(n²)</li>
+          <li>Exponential Time: O(cⁿ), c &gt; 1</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Analysis of Algorithms</h2>
+    <div class="animated-box js-animate">
+      <ul>
+        <li><b>Apriori Analysis:</b> Theoretical estimation of resources before actual implementation.</li>
+        <li><b>Aposteriori Analysis:</b> Empirical analysis after implementation on a specific machine and language.</li>
+      </ul>
+      <div class="highlight">
+        <b>Why Analyze?</b> Efficient algorithms are necessary for handling large data. The growth of time/space complexity with input size is key for comparing algorithms.
+      </div>
+    </div>
+
+    <h2>Asymptotic Notations</h2>
+    <div class="animated-box js-animate">
+      <div class="table-scroll">
+        <table>
+          <tr>
+            <th>Notation</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><b>Big-O</b> <span style="color:#2e8bfa;">O(g(n))</span></td>
+            <td>Upper bound; worst-case scenario.<br>f(n) ≤ c·g(n) for large n</td>
+          </tr>
+          <tr>
+            <td><b>Big-Omega</b> <span style="color:#2e8bfa;">Ω(g(n))</span></td>
+            <td>Lower bound; best-case scenario.<br>f(n) ≥ c·g(n) for large n</td>
+          </tr>
+          <tr>
+            <td><b>Theta</b> <span style="color:#2e8bfa;">Θ(g(n))</span></td>
+            <td>Tight bound; both upper and lower.<br>f(n) = O(g(n)) and f(n) = Ω(g(n))</td>
+          </tr>
+          <tr>
+            <td><b>Little-o</b> <span style="color:#2e8bfa;">o(g(n))</span></td>
+            <td>Strict upper bound; grows strictly slower than g(n).</td>
+          </tr>
+          <tr>
+            <td><b>Little-omega</b> <span style="color:#2e8bfa;">ω(g(n))</span></td>
+            <td>Strict lower bound; grows strictly faster than g(n).</td>
+          </tr>
+        </table>
+      </div>
+      <div class="highlight">
+        <b>Common Growth Rates:</b>
+        <ul>
+          <li>Constant: O(1)</li>
+          <li>Logarithmic: O(log n)</li>
+          <li>Linear: O(n)</li>
+          <li>Log-linear: O(n log n)</li>
+          <li>Quadratic: O(n²)</li>
+          <li>Cubic: O(n³)</li>
+          <li>Exponential: O(cⁿ)</li>
+          <li>Factorial: O(n!)</li>
+        </ul>
+      </div>
+      <h3>Graphs of Asymptotic Notations</h3>
+      <div class="graph-img" title="Insert your Big-O graph here"></div>
+      <div class="note"># Replace this area with your Big-O, Omega, and Theta graphs. Recommended size: 380x220px.</div>
+    </div>
+
+    <h2>Types of Analysis (Best, Worst, Average Case)</h2>
+    <div class="animated-box js-animate">
+      <ul>
+        <li><b>Worst Case (Big-O):</b> Maximum time taken on any input of size n.</li>
+        <li><b>Best Case (Omega):</b> Minimum time taken on any input of size n.</li>
+        <li><b>Average Case (Theta):</b> Expected time over all possible inputs of size n.</li>
+      </ul>
+      <div class="highlight">
+        <b>Visual Representation:</b>
+        <div class="graph-img" title="Insert your best/worst/average case graph here"></div>
+        <div class="note"># Add a graph showing best, worst, and average cases here.</div>
+      </div>
+    </div>
+
+    <h2>Input Size</h2>
+    <div class="animated-box js-animate">
+      <ul>
+        <li>Number of elements in an array</li>
+        <li>Degree of a polynomial</li>
+        <li>Number of vertices/edges in a graph</li>
+        <li>Number of bits in a binary input</li>
+      </ul>
+    </div>
+
+    <h2>Practical Example: Comparing Algorithms</h2>
+    <div class="animated-box js-animate">
+      <p>
+        Suppose Algorithm A has time complexity <b>5,000n</b> and Algorithm B has <b>1.1ⁿ</b>. For small n, B may be faster, but as n grows, A becomes much more efficient. This illustrates the importance of focusing on growth rates rather than absolute step counts for large inputs.
+      </p>
+      <div class="graph-img" title="Insert your comparison graph here"></div>
+      <div class="note"># Add a graph comparing linear vs exponential growth here.</div>
+    </div>
+
+    <h2>Summary Table: Asymptotic Notations</h2>
+    <div class="animated-box js-animate">
+      <div class="table-scroll">
+        <table>
+          <tr>
+            <th>Notation</th>
+            <th>Mathematical Definition</th>
+            <th>Meaning</th>
+          </tr>
+          <tr>
+            <td>O(g(n))</td>
+            <td>f(n) ≤ c·g(n)</td>
+            <td>Upper bound (worst case)</td>
+          </tr>
+          <tr>
+            <td>Ω(g(n))</td>
+            <td>f(n) ≥ c·g(n)</td>
+            <td>Lower bound (best case)</td>
+          </tr>
+          <tr>
+            <td>Θ(g(n))</td>
+            <td>Both O(g(n)) and Ω(g(n))</td>
+            <td>Tight bound (average case)</td>
+          </tr>
+          <tr>
+            <td>o(g(n))</td>
+            <td>f(n) &lt; c·g(n) ∀ c &gt; 0</td>
+            <td>Strictly less than g(n)</td>
+          </tr>
+          <tr>
+            <td>ω(g(n))</td>
+            <td>f(n) &gt; c·g(n) ∀ c &gt; 0</td>
+            <td>Strictly more than g(n)</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <b>References:</b> DSALect03.pdf, Lecture Notes on Design and Analysis of Algorithms
+    </div>
+  </section>
+  <footer>
+    &copy; 2025 DSA Learning Portal | Designed for student engagement 💡 | Powered by <strong>RELU Club</strong>
+  </footer>
+  <script>
+    // Animation on scroll for .js-animate
+    function revealOnScroll() {
+      var elements = document.querySelectorAll('.js-animate');
+      var windowHeight = window.innerHeight;
+      for (var i = 0; i < elements.length; i++) {
+        var elementTop = elements[i].getBoundingClientRect().top;
+        if (elementTop < windowHeight - 60) {
+          elements[i].classList.add('visible');
+        }
+      }
+    }
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+
+    // Navbar active state
+    function setActive(el) {
+      document.querySelectorAll('.navbar a').forEach(a => a.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Smooth scroll for navbar
+    document.querySelectorAll('.navbar a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href').slice(1);
+        const target = document.getElementById(targetId);
+        if (target) {
+          e.preventDefault();
+          window.scrollTo({ top: target.offsetTop - 10, behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Fun animation for header on click
+    document.querySelector('header').addEventListener('click', function() {
+      this.style.background = 'linear-gradient(90deg, #6dd5ed 0%, #2e8bfa 100%)';
+      setTimeout(() => {
+        this.style.background = 'linear-gradient(90deg, #2e8bfa 70%, #6dd5ed 100%)';
+      }, 800);
+    });
+  </script>
+</body>
+</html>

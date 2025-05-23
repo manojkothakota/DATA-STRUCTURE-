@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linked List Visualizer | RELU Club</title>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
+        .container { max-width: 900px; margin: 40px auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { text-align: center; margin-bottom: 20px; color: #6a11cb; }
+        .step-container { background: #f5f3ff; border-radius: 10px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .ll-list { display: flex; align-items: center; justify-content: center; gap: 0px; margin-top: 2rem; flex-wrap: wrap; position: relative; }
+        .ll-node { width: 70px; height: 70px; background: #6a11cb; color: white; font-weight: bold; font-size: 1.3rem; border-radius: 15px; display: flex; align-items: center; justify-content: center; position: relative; margin: 0 15px; box-shadow: 0 5px 15px rgba(106, 17, 203, 0.2); z-index: 2; transition: all 0.5s ease; }
+        .ll-node.head { background: #ff2d75; border: 3px solid white; }
+        .ll-node.tail { background: #2575fc; border: 3px solid white; }
+        .ll-circular { position: relative; width: 400px; height: 400px; margin: 0 auto; }
+        .ll-circular .ll-node { position: absolute; transform: translate(-50%, -50%); }
+        .ll-circular .ll-arrow-svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .btn { display: inline-block; background: linear-gradient(45deg, #6a11cb, #2575fc); color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3); transition: all 0.3s ease; border: none; cursor: pointer; margin: 5px; }
+        .btn:hover { transform: translateY(-3px); }
+        .opform input { padding: 5px 10px; border-radius: 10px; border: 1px solid #ccc; margin: 0 5px; }
+        .info-section { background: #f0f4f8; border-radius: 10px; padding: 20px; margin-top: 30px; }
+        .info-section h2 { color: #6a11cb; margin-top: 0; }
+        .info-card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .info-card h3 { margin-top: 0; color: #2575fc; }
+        .tab-buttons { display: flex; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; background: #e0e0e0; border: none; cursor: pointer; transition: all 0.3s; }
+        .tab-btn.active { background: #6a11cb; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+         footer {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 3rem 0;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-logo {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-sub {
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  opacity: 0.7;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.footer-links a {
+  color: #fff;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #2ecc71;
+}
+
+
+
+.copyright {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linked List Visualizer</h1>
+        <div class="step-container" id="step1">
+            <h2>Step 1: Enter Number of Nodes</h2>
+            <input type="number" id="nodeCount" min="1" max="9" value="4">
+            <button class="btn" onclick="createValueInputs()">Next</button>
+        </div>
+        <div class="step-container" id="step2" style="display: none;">
+            <h2>Step 2: Enter Node Values</h2>
+            <div id="valueInputs"></div>
+            <button class="btn" onclick="createLinkedList()">Create Linked List</button>
+        </div>
+        <div class="step-container" id="step3" style="display: none;">
+            <div style="margin-bottom: 20px;">
+                <label for="listType" style="font-weight: 600; margin-right: 10px;">List Type:</label>
+                <select id="listType" onchange="renderLinkedList()">
+                    <option value="singly">Singly Linked</option>
+                    <option value="doubly">Doubly Linked</option>
+                    <option value="circular">Circular Singly</option>
+                    <option value="circularDoubly">Circular Doubly</option>
+                </select>
+            </div>
+            <div style="margin-bottom:20px;">
+                <button class="btn" onclick="showInsertForm('start')">Insert at Start</button>
+                <button class="btn" onclick="showInsertForm('end')">Insert at End</button>
+                <button class="btn" onclick="showInsertForm('pos')">Insert at Position</button>
+                <button class="btn" onclick="deleteNode('start')">Delete at Start</button>
+                <button class="btn" onclick="deleteNode('end')">Delete at End</button>
+                <button class="btn" onclick="showDeletePosForm()">Delete at Position</button>
+                <button class="btn" onclick="reverseList()">Reverse</button>
+            </div>
+            <div id="opform" class="opform" style="margin-bottom:20px;"></div>
+            <div class="ll-container" id="linkedListVisualization"></div>
+        </div>
+
+        <div class="info-section">
+            <h2>Linked List Information</h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="openTab(event, 'tab-singly')">Singly</button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-doubly')">Doubly</button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-circular')">Circular</button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-usage')">Usage</button>
+            </div>
+            
+            <div id="tab-singly" class="tab-content active">
+                <div class="info-card">
+                    <h3>Singly Linked List</h3>
+                    <p>A singly linked list is a linear data structure where each element (node) contains data and a reference (or link) to the next node in the sequence.</p>
+                    <p><strong>Structure:</strong> Each node has two parts - data and a next pointer.</p>
+                    <p><strong>Characteristics:</strong></p>
+                    <ul>
+                        <li>Unidirectional traversal (only forward)</li>
+                        <li>Memory efficient (only one pointer per node)</li>
+                        <li>Insertion/deletion at head is O(1)</li>
+                        <li>Insertion/deletion at tail is O(n) without tail pointer</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="tab-doubly" class="tab-content">
+                <div class="info-card">
+                    <h3>Doubly Linked List</h3>
+                    <p>A doubly linked list is a linked data structure where each node contains data and two references (links) - one to the next node and one to the previous node.</p>
+                    <p><strong>Structure:</strong> Each node has three parts - data, next pointer, and previous pointer.</p>
+                    <p><strong>Characteristics:</strong></p>
+                    <ul>
+                        <li>Bidirectional traversal (forward and backward)</li>
+                        <li>More memory (two pointers per node)</li>
+                        <li>Insertion/deletion at both ends is O(1)</li>
+                        <li>Easier deletion of arbitrary nodes</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="tab-circular" class="tab-content">
+                <div class="info-card">
+                    <h3>Circular Linked List</h3>
+                    <p>A circular linked list is a variation where the last node points back to the first node instead of containing a null reference.</p>
+                    <p><strong>Types:</strong></p>
+                    <ul>
+                        <li><strong>Circular Singly Linked List:</strong> Last node points to first node, unidirectional</li>
+                        <li><strong>Circular Doubly Linked List:</strong> Last node points to first node and first node points to last node, bidirectional</li>
+                    </ul>
+                    <p><strong>Characteristics:</strong></p>
+                    <ul>
+                        <li>No null references (tail points to head)</li>
+                        <li>Can traverse entire list from any node</li>
+                        <li>Useful for round-robin scheduling</li>
+                        <li>Circular buffers implementation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="tab-usage" class="tab-content">
+                <div class="info-card">
+                    <h3>Common Uses of Linked Lists</h3>
+                    <p><strong>Real-world Applications:</strong></p>
+                    <ul>
+                        <li><strong>Music/Video Playlists:</strong> Next/previous navigation</li>
+                        <li><strong>Browser History:</strong> Back/forward navigation</li>
+                        <li><strong>Undo Functionality:</strong> Maintaining state history</li>
+                        <li><strong>Memory Management:</strong> Operating system memory allocation</li>
+                        <li><strong>Hash Tables:</strong> Handling collisions</li>
+                    </ul>
+                    <p><strong>When to Use:</strong></p>
+                    <ul>
+                        <li>When frequent insertions/deletions are needed</li>
+                        <li>When the size is unpredictable (dynamic memory allocation)</li>
+                        <li>When random access is not required</li>
+                        <li>When you need efficient operations at both ends (doubly linked)</li>
+                    </ul>
+                    <p><strong>Performance Comparison:</strong></p>
+                    <table style="width:100%; border-collapse: collapse;">
+                        <tr style="background:#6a11cb; color:white;">
+                            <th style="padding:8px; text-align:left;">Operation</th>
+                            <th style="padding:8px; text-align:left;">Singly</th>
+                            <th style="padding:8px; text-align:left;">Doubly</th>
+                        </tr>
+                        <tr style="background:#f0f0f0;">
+                            <td style="padding:8px; border:1px solid #ddd;">Insert at head</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(1)</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(1)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Insert at tail</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(n) or O(1) with tail pointer</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(1)</td>
+                        </tr>
+                        <tr style="background:#f0f0f0;">
+                            <td style="padding:8px; border:1px solid #ddd;">Delete at head</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(1)</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(1)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Delete at tail</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(n)</td>
+                            <td style="padding:8px; border:1px solid #ddd;">O(1)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <svg width="0" height="0" style="position:absolute">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#6a11cb" />
+            </marker>
+            <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="2" refY="3" orient="auto">
+                <path d="M10,0 L10,6 L1,3 z" fill="#2575fc" />
+            </marker>
+        </defs>
+    </svg>
+     <footer>
+  <div class="footer-content">
+    <div class="footer-logo">DSA Visualizer</div>
+    <div class="footer-sub">RELU CLUB</div>
+    
+    <div class="footer-links">
+      <a href="intropage of dsa(relu).html">Home</a>
+      <a href="subtopics.html">Topics</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+    
+   
+    
+    <div class="copyright">
+      &copy; 2025 DSA Visualizer | Developed by RELU Club. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+    <script>
+        let linkedList = [];
+        let listType = "singly";
+        
+        function createValueInputs() {
+            const nodeCount = Math.max(1, Math.min(9, parseInt(document.getElementById('nodeCount').value)));
+            const valueInputs = document.getElementById('valueInputs');
+            valueInputs.innerHTML = '';
+            for (let i = 0; i < nodeCount; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = `Node ${i + 1} value`;
+                input.required = true;
+                input.style.margin = '5px';
+                input.id = `nodeValue${i}`;
+                valueInputs.appendChild(input);
+            }
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+        
+        function createLinkedList() {
+            const valueInputs = document.getElementById('valueInputs').querySelectorAll('input');
+            linkedList = [];
+            for (let input of valueInputs) {
+                if (!input.value.trim()) return alert('Please enter all node values');
+                linkedList.push(input.value);
+            }
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'block';
+            renderLinkedList();
+        }
+        
+        function renderLinkedList() {
+            listType = document.getElementById('listType').value;
+            document.getElementById('opform').innerHTML = '';
+            const vis = document.getElementById('linkedListVisualization');
+            vis.innerHTML = '';
+            if (linkedList.length === 0) {
+                vis.innerHTML = '<div style="color:#888; text-align:center;">The list is empty</div>';
+                return;
+            }
+            if (listType === 'singly') renderSingly();
+            else if (listType === 'doubly') renderDoubly();
+            else if (listType === 'circular') renderCircular(false);
+            else if (listType === 'circularDoubly') renderCircular(true);
+        }
+        
+        function renderSingly() {
+            const vis = document.getElementById('linkedListVisualization');
+            const listDiv = document.createElement('div');
+            listDiv.className = 'll-list';
+            for (let i = 0; i < linkedList.length; i++) {
+                const node = document.createElement('div');
+                node.className = 'll-node';
+                if (i === 0) node.classList.add('head');
+                if (i === linkedList.length - 1) node.classList.add('tail');
+                node.textContent = linkedList[i];
+                listDiv.appendChild(node);
+                if (i < linkedList.length - 1) {
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg.setAttribute("width", "60");
+                    svg.setAttribute("height", "30");
+                    svg.style.overflow = "visible";
+                    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    arrow.setAttribute("x1", "10");
+                    arrow.setAttribute("y1", "15");
+                    arrow.setAttribute("x2", "50");
+                    arrow.setAttribute("y2", "15");
+                    arrow.setAttribute("stroke", "#6a11cb");
+                    arrow.setAttribute("stroke-width", "3");
+                    arrow.setAttribute("marker-end", "url(#arrowhead)");
+                    svg.appendChild(arrow);
+                    listDiv.appendChild(svg);
+                }
+            }
+            vis.appendChild(listDiv);
+        }
+        
+        function renderDoubly() {
+            const vis = document.getElementById('linkedListVisualization');
+            const listDiv = document.createElement('div');
+            listDiv.className = 'll-list';
+            for (let i = 0; i < linkedList.length; i++) {
+                const node = document.createElement('div');
+                node.className = 'll-node';
+                if (i === 0) node.classList.add('head');
+                if (i === linkedList.length - 1) node.classList.add('tail');
+                node.textContent = linkedList[i];
+                listDiv.appendChild(node);
+                if (i < linkedList.length - 1) {
+                    // Forward (above)
+                    const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg1.setAttribute("width", "60");
+                    svg1.setAttribute("height", "30");
+                    svg1.style.position = "relative";
+                    svg1.style.top = "-18px";
+                    const arrow1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    arrow1.setAttribute("x1", "10");
+                    arrow1.setAttribute("y1", "10");
+                    arrow1.setAttribute("x2", "50");
+                    arrow1.setAttribute("y2", "10");
+                    arrow1.setAttribute("stroke", "#6a11cb");
+                    arrow1.setAttribute("stroke-width", "3");
+                    arrow1.setAttribute("marker-end", "url(#arrowhead)");
+                    svg1.appendChild(arrow1);
+                    // Backward (below)
+                    const svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg2.setAttribute("width", "60");
+                    svg2.setAttribute("height", "30");
+                    svg2.style.position = "relative";
+                    svg2.style.top = "18px";
+                    const arrow2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    arrow2.setAttribute("x1", "50");
+                    arrow2.setAttribute("y1", "20");
+                    arrow2.setAttribute("x2", "10");
+                    arrow2.setAttribute("y2", "20");
+                    arrow2.setAttribute("stroke", "#2575fc");
+                    arrow2.setAttribute("stroke-width", "3");
+                    arrow2.setAttribute("marker-end", "url(#arrowhead2)");
+                    svg2.appendChild(arrow2);
+                    listDiv.appendChild(svg1);
+                    listDiv.appendChild(svg2);
+                }
+            }
+            vis.appendChild(listDiv);
+        }
+        
+        function renderCircular(isDoubly) {
+            const vis = document.getElementById('linkedListVisualization');
+            const n = linkedList.length;
+            const centerX = 200, centerY = 200, radius = 130;
+            const container = document.createElement('div');
+            container.className = 'll-circular';
+            let nodeCenters = [];
+            for (let i = 0; i < n; i++) {
+                const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                const node = document.createElement('div');
+                node.className = 'll-node';
+                if (i === 0) node.classList.add('head');
+                if (i === n - 1) node.classList.add('tail');
+                node.style.left = `${x}px`;
+                node.style.top = `${y}px`;
+                node.textContent = linkedList[i];
+                container.appendChild(node);
+                nodeCenters.push({x, y});
+            }
+            for (let i = 0; i < n; i++) {
+                const from = nodeCenters[i];
+                const to = nodeCenters[(i + 1) % n];
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute('class', 'll-arrow-svg');
+                svg.setAttribute('width', '400');
+                svg.setAttribute('height', '400');
+                if (!isDoubly) {
+                    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    arrow.setAttribute('x1', from.x);
+                    arrow.setAttribute('y1', from.y);
+                    arrow.setAttribute('x2', to.x);
+                    arrow.setAttribute('y2', to.y);
+                    arrow.setAttribute('stroke', '#6a11cb');
+                    arrow.setAttribute('stroke-width', '3');
+                    arrow.setAttribute('marker-end', 'url(#arrowhead)');
+                    svg.appendChild(arrow);
+                } else {
+                    // Forward (curved)
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    const mx = (from.x + to.x) / 2 + (centerX - (from.x + to.x) / 2) * 0.3;
+                    const my = (from.y + to.y) / 2 + (centerY - (from.y + to.y) / 2) * 0.3;
+                    path.setAttribute('d', `M${from.x},${from.y} Q${mx},${my} ${to.x},${to.y}`);
+                    path.setAttribute('stroke', '#6a11cb');
+                    path.setAttribute('stroke-width', '3');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                    svg.appendChild(path);
+                    // Backward (curved)
+                    const from2 = nodeCenters[(i + 1) % n];
+                    const to2 = nodeCenters[i];
+                    const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    const mx2 = (from2.x + to2.x) / 2 + (centerX - (from2.x + to2.x) / 2) * 0.3;
+                    const my2 = (from2.y + to2.y) / 2 + (centerY - (from2.y + to2.y) / 2) * 0.3;
+                    path2.setAttribute('d', `M${from2.x},${from2.y} Q${mx2},${my2} ${to2.x},${to2.y}`);
+                    path2.setAttribute('stroke', '#2575fc');
+                    path2.setAttribute('stroke-width', '2');
+                    path2.setAttribute('fill', 'none');
+                    path2.setAttribute('marker-end', 'url(#arrowhead2)');
+                    svg.appendChild(path2);
+                }
+                container.appendChild(svg);
+            }
+            vis.appendChild(container);
+        }
+        
+        // Operations
+        function showInsertForm(where) {
+            let html = '';
+            if (where === 'pos') {
+                html = `<form onsubmit="insertAtPos(event)">
+                    <input type="number" id="insertPos" min="1" max="${linkedList.length+1}" required placeholder="Position">
+                    <input type="text" id="insertVal" required placeholder="Value">
+                    <button class="btn" type="submit">Insert</button>
+                </form>`;
+            } else {
+                html = `<form onsubmit="insertNode('${where}',event)">
+                    <input type="text" id="insertVal" required placeholder="Value">
+                    <button class="btn" type="submit">Insert</button>
+                </form>`;
+            }
+            document.getElementById('opform').innerHTML = html;
+        }
+        
+        function insertNode(where, e) {
+            e.preventDefault();
+            const val = document.getElementById('insertVal').value;
+            if (where === 'start') linkedList.unshift(val);
+            else if (where === 'end') linkedList.push(val);
+            document.getElementById('opform').innerHTML = '';
+            renderLinkedList();
+        }
+        
+        function insertAtPos(e) {
+            e.preventDefault();
+            let pos = parseInt(document.getElementById('insertPos').value);
+            const val = document.getElementById('insertVal').value;
+            pos = Math.max(1, Math.min(linkedList.length+1, pos));
+            linkedList.splice(pos-1, 0, val);
+            document.getElementById('opform').innerHTML = '';
+            renderLinkedList();
+        }
+        
+        function deleteNode(where) {
+            if (linkedList.length === 0) return;
+            if (where === 'start') linkedList.shift();
+            else if (where === 'end') linkedList.pop();
+            document.getElementById('opform').innerHTML = '';
+            renderLinkedList();
+        }
+        
+        function showDeletePosForm() {
+            document.getElementById('opform').innerHTML = `
+                <form onsubmit="deleteAtPos(event)">
+                  <input type="number" id="deletePos" min="1" max="${linkedList.length}" required placeholder="Position">
+                  <button class="btn" type="submit">Delete</button>
+                </form>
+            `;
+        }
+        
+        function deleteAtPos(e) {
+            e.preventDefault();
+            let pos = parseInt(document.getElementById('deletePos').value);
+            pos = Math.max(1, Math.min(linkedList.length, pos));
+            linkedList.splice(pos-1, 1);
+            document.getElementById('opform').innerHTML = '';
+            renderLinkedList();
+        }
+        
+        function reverseList() {
+            linkedList.reverse();
+            document.getElementById('opform').innerHTML = '';
+            renderLinkedList();
+        }
+        
+        // Tab functionality for info section
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabButtons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>

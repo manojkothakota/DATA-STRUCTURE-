@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stack | DSA Visualizer | RELU Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Ubuntu', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #8e2de2, #4a00e0);
+      min-height: 100vh;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #dcdcdc;
+    }
+
+    .stack-visualizer {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .stack-container {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      min-height: 300px;
+      border: 2px dashed white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .stack-element {
+      background: white;
+      color: #4a00e0;
+      padding: 0.8rem 2rem;
+      border-radius: 5px;
+      margin: 0.5rem 0;
+      width: 100px;
+      text-align: center;
+      font-weight: bold;
+      animation: slideIn 0.3s ease-in-out;
+    }
+
+    .stack-label {
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      font-style: italic;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      justify-content: center;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      margin-top: 0.2rem;
+    }
+
+    .btn {
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      color: white;
+      background-color: #4a00e0;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #8e2de2;
+    }
+
+    .operation-status {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      font-style: italic;
+      color: #ffffcc;
+    }
+
+    .btn.navigate {
+      margin-top: 1rem;
+      background-color: #00b894;
+    }
+
+    .btn.navigate:hover {
+      background-color: #00cec9;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      input[type="text"] {
+        width: 100%;
+      }
+    }
+     footer {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 3rem 0;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-logo {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-sub {
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  opacity: 0.7;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.footer-links a {
+  color: #fff;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #2ecc71;
+}
+
+
+
+.copyright {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Stack Visualizer</h1>
+    <p>DSA Project by RELU Club</p>
+  </header>
+
+  <div class="stack-visualizer">
+    <div class="stack-container">
+      <div class="stack-label">Top</div>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="push-value">Enter Value</label>
+        <input type="text" id="push-value" placeholder="e.g., 10">
+      </div>
+      <button class="btn push" onclick="pushElement()">Push</button>
+      <button class="btn pop" onclick="popElement()">Pop</button>
+      <button class="btn peek" onclick="peekElement()">Peek</button>
+      <button class="btn reset" onclick="resetStack()">Reset</button>
+    </div>
+
+    <div class="operation-status"></div>
+
+    <button class="btn navigate" onclick="window.location.href='dsa lakshmi mam .html'">
+        👉 Go to  Converter
+    </button>
+  </div>
+   <footer>
+  <div class="footer-content">
+    <div class="footer-logo">DSA Visualizer</div>
+    <div class="footer-sub">RELU CLUB</div>
+    
+    <div class="footer-links">
+      <a href="intropage of dsa(relu).html">Home</a>
+      <a href="subtopics.html">Topics</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+    
+   
+    
+    <div class="copyright">
+      &copy; 2025 DSA Visualizer | Developed by RELU Club. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+  <script>
+    const stackContainer = document.querySelector('.stack-container');
+    const status = document.querySelector('.operation-status');
+    let stack = [];
+
+    function updateStackView() {
+      stackContainer.innerHTML = '<div class="stack-label">Top</div>';
+      stack.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'stack-element';
+        div.textContent = item;
+        stackContainer.appendChild(div);
+      });
+    }
+
+    function pushElement() {
+      const value = document.querySelector('#push-value').value.trim();
+      if (value) {
+        stack.push(value);
+        status.textContent = `Pushed: ${value}`;
+        updateStackView();
+        document.querySelector('#push-value').value = '';
+      } else {
+        status.textContent = "Please enter a value.";
+      }
+    }
+
+    function popElement() {
+      if (stack.length === 0) {
+        status.textContent = "Stack is empty!";
+        return;
+      }
+      const popped = stack.pop();
+      status.textContent = `Popped: ${popped}`;
+      updateStackView();
+    }
+
+    function peekElement() {
+      if (stack.length === 0) {
+        status.textContent = "Stack is empty!";
+        return;
+      }
+      status.textContent = `Top element: ${stack[stack.length - 1]}`;
+    }
+
+    function resetStack() {
+      stack = [];
+      status.textContent = "Stack reset.";
+      updateStackView();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateStackView();
+    });
+  </script>
+</body>
+</html>
